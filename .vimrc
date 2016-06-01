@@ -31,7 +31,7 @@ let s:is_cui     = !has('gui_running') && !(g:is_windows && s:is_nvim)
 " let s:is_cui     = !has('gui_running')
 " echomsg s:is_cui
 let g:at_startup =  has('vim_starting')
-" let s:is_tmux    = $TMUX !=# ''
+let s:is_tmux    = $TMUX !=# ''
 " let s:is_ssh     = $SSH_TTY ==# ''
 " let s:is_android =  has('unix')
 "       \ && ($HOSTNAME ==? 'android' || $VIM =~? 'net\.momodalo\.app\.vimtouch')
@@ -378,6 +378,9 @@ endif
 if &t_Co > 2 || !s:is_cui
   syntax enable
   set hlsearch
+endif
+if s:is_tmux
+  set t_ut=
 endif
 
 " Setting for the system that not identify upper cases and lower cases.
