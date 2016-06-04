@@ -15,7 +15,6 @@
 " ------------------------------------------------------------------------------
 if 0 | endif
 if &compatible && has('vim_starting')
-  echo 'aa'
   set nocompatible
 endif
 " Variables for various environment.
@@ -1784,7 +1783,6 @@ if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
   call dein#add('Shougo/dein.vim')
   call dein#add('vim-jp/vimdoc-ja')
-        " \ 'on_func': ['vital', 'vitalizer']
   call dein#add('vim-jp/vital.vim', {
         \ 'on_cmd': 'Vitalize',
         \ 'on_func': 'vital'
@@ -2212,9 +2210,7 @@ if dein#load_state(s:deindir)
         \})
   call dein#add('tagexplorer.vim', {
         \ 'if': executable('ctags'),
-        \ 'on_ft': ['cpp', 'java', 'perl', 'python', 'ruby', 'tags']
-        \})
-  call dein#add('tagexplorer.vim', {
+        \ 'on_ft': ['cpp', 'java', 'perl', 'python', 'ruby', 'tags'],
         \ 'on_cmd': 'TagExplorer'
         \})
   call dein#add('majutsushi/tagbar', {
@@ -3260,9 +3256,9 @@ if dein#tap('TweetVim')
   nmap ,t  [tweetvim]
   " nnoremap [ref]t
   "       \ :<C-u>call tmpwin#toggle(['normal! gg', 'setl nohidden'], 'TweetVimHomeTimeline')<CR>
-  nnoremap [ref]tc  :<C-u>call tweetvim#say#current_line()<CR>
-  nnoremap [ref]ts  :<C-u>call tweetvim#say#open_with_account()<CR>
-  nnoremap [ref]th  :<C-u>call tmpwin#toggle('TweetVimHomeTimeline')<CR>
+  nnoremap [tweetvim]tc  :<C-u>call tweetvim#say#current_line()<CR>
+  nnoremap [tweetvim]ts  :<C-u>call tweetvim#say#open_with_account()<CR>
+  nnoremap [tweetvim]th  :<C-u>call tmpwin#toggle('TweetVimHomeTimeline')<CR>
 endif
 
 
