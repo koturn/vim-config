@@ -8,7 +8,7 @@ BASEURL='https://raw.githubusercontent.com'
 # $2: Repository name
 # $3: file name
 function install_colorscheme() {
-  curl "$BASEURL/$1/$2/master/colors/$3" -o "colors/$3"
+  curl "$BASEURL/$1/$2/master/colors/$3" -o "~/.vim/colors/$3"
 }
 
 install_colorscheme w0ng vim-hybrid hybrid.vim
