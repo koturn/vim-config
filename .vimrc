@@ -380,6 +380,8 @@ if &t_Co > 2 || !s:is_cui
 endif
 if s:is_tmux
   set t_ut=
+elseif exists('&termguicolors')
+  set termguicolors
 endif
 
 " Setting for the system that not identify upper cases and lower cases.
