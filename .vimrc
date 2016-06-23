@@ -231,7 +231,7 @@ if exists('+breakindent')
 endif
 set synmaxcol=1000
 set textwidth=0
-" set colorcolumn=80,100
+set colorcolumn=80,100
 set foldmethod=marker
 set browsedir=buffer
 set showmatch
@@ -272,7 +272,7 @@ set shiftwidth=2 tabstop=2 softtabstop=-1
 set shiftround
 set copyindent
 " Show line number.
-set number
+" set number
 set updatetime=1500
 " title
 " set title
