@@ -2260,6 +2260,7 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('octol/vim-cpp-enhanced-highlight', {
         \ 'on_ft': ['c', 'cpp'],
         \})
+  call dein#add('kana/vim-operator-user')
   call dein#add('rhysd/vim-clang-format', {
         \ 'depends': ['vim-operator-user'],
         \ 'on_cmd': ['ClangFormat', 'ClangFormatEchoFormattedCode', 'ClangFormatAutoToggle'],
