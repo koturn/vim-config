@@ -406,25 +406,23 @@ endif
 " ------------------------------------------------------------------------------
 " CLPUM patch {{{
 " ------------------------------------------------------------------------------
-if exists('+clpum')
-  set clpum
-  set clpumheight=14
-  set clcompleteopt+=noinsert
-  let &clcompletefunc = s:sid_prefix . 'clpum_complete'
-  autocmd MyAutoCmd ColorScheme * highlight! link ClPmenu Pmenu
+if has('clpum')
+  set wildmenu wildmode=longest,popup
+  set clpumheight=40
+  let &clcompletefunc = s:sid_prefix . 's:clpum_complete'
   function! s:clpum_complete(findstart, base) abort
     if a:findstart
       return getcmdpos()
     else
       return [
-            \ {'word': 'January', 'abbr': 'Jan', 'menu': 'January'},
-            \ {'word': 'February', 'abbr': 'Feb', 'menu': 'February'},
-            \ {'word': 'March', 'abbr': 'Mar', 'menu': 'March'},
-            \ {'word': 'April', 'abbr': 'Apr', 'menu': 'April'},
-            \ {'word': 'May', 'abbr': 'May', 'menu': 'May'}
-            \]
+            \   { 'word': 'Jan', 'menu': 'January' },
+            \   { 'word': 'Feb', 'menu': 'February' },
+            \   { 'word': 'Mar', 'menu': 'March' },
+            \   { 'word': 'Apr', 'menu': 'April' },
+            \   { 'word': 'May', 'menu': 'May' },
+            \ ]
     endif
-  endfunc
+  endfunction
 endif
 " }}}
 " }}}
@@ -2287,9 +2285,9 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('osyo-manga/vim-snowdrop', {
         \ 'on_ft': ['c', 'cpp']
         \})
-  call dein#add('justmao945/vim-clang', {
-        \ 'on_ft': ['c', 'cpp']
-        \})
+  " call dein#add('justmao945/vim-clang', {
+  "       \ 'on_ft': ['c', 'cpp']
+  "       \})
   call dein#add('pangloss/vim-javascript', {
         \ 'on_ft': 'javascript'
         \})
