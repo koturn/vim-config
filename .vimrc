@@ -410,18 +410,15 @@ if has('clpum')
   set wildmenu wildmode=longest,popup
   set clpumheight=40
   let &clcompletefunc = s:sid_prefix . 's:clpum_complete'
+  autocmd MyAutoCmd ColorScheme * highlight! link ClPmenu Pmenu
   function! s:clpum_complete(findstart, base) abort
-    if a:findstart
-      return getcmdpos()
-    else
-      return [
-            \   { 'word': 'Jan', 'menu': 'January' },
-            \   { 'word': 'Feb', 'menu': 'February' },
-            \   { 'word': 'Mar', 'menu': 'March' },
-            \   { 'word': 'Apr', 'menu': 'April' },
-            \   { 'word': 'May', 'menu': 'May' },
-            \ ]
-    endif
+    return a:findstart ? getcmdpos() : [
+          \ {'word': 'Jan', 'menu': 'January'},
+          \ {'word': 'Feb', 'menu': 'February'},
+          \ {'word': 'Mar', 'menu': 'March'},
+          \ {'word': 'Apr', 'menu': 'April'},
+          \ {'word': 'May', 'menu': 'May'},
+          \]
   endfunction
 endif
 " }}}
