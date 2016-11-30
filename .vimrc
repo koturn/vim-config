@@ -238,6 +238,7 @@ set showmatch
 set smartcase
 set whichwrap=b,s,h,l,<,>,[,]
 set visualbell t_vb=
+set belloff=all
 set lazyredraw
 set viminfo= noswapfile nobackup nowritebackup
 if has('persistent_undo')
@@ -298,7 +299,6 @@ set spelllang=en,cjk
 " complete
 set completeopt=menu,preview
 set showfulltag
-set wildoptions=tagfile
 " Setting for grep
 if s:executable('ag')
   set grepprg=ag\ --nogroup\ -iS
@@ -338,6 +338,12 @@ if has('clipboard')
   endif
 endif
 
+if s:is_tmux
+  set t_ut=
+elseif exists('&termguicolors')
+  set termguicolors
+endif
+
 " In windows, not to use cygwin-git.
 if g:is_windows
   let s:win_git_path = get(g:private, 'win_git_path', '')
@@ -348,60 +354,35 @@ if g:is_windows
 endif
 
 
-" ------------------------------------------------------------------------------
-" Setting written in vimrc of KaoriYa-vim {{{
-" ------------------------------------------------------------------------------
-" Don't ignore cases when searching.
 set ignorecase
-" Delete indent and EOL with backspace.
 set backspace=indent,eol,start
-" Searches wrap around the end of the file.
 set wrapscan
-" Display the brackets corresponding to the input brackets.
 set showmatch
-" Use enhanced command-line completion.
-" set wildmenu wildmode=full
-" set wildmenu wildmode=list:full
-set wildmenu wildmode=longest:full,full
-" Show commands on command-line.
+set wildmenu wildmode=longest:full,full wildoptions=tagfile
 set showcmd
-" Set two lines the height of command-line.
 set cmdheight=2
-
-set history=200  " keep 50 lines of command-line history
-set incsearch   " do incremental searching
+set history=200
+set incsearch
 if has('mouse')
-  set mouse=a
-  set mousemodel=popup
+  set mouse=a mousemodel=popup
 endif
 if &t_Co > 2 || !s:is_cui
   syntax enable
   set hlsearch
 endif
-if s:is_tmux
-  set t_ut=
-elseif exists('&termguicolors')
-  set termguicolors
-endif
-
-" Setting for the system that not identify upper cases and lower cases.
-"   (example: DOS / Windows / MacOS)
 if filereadable($HOME . '/.vimrc') && filereadable($HOME . '/.ViMrC')
-  set tags=./tags;,tags;  " Prevent duplication of tags file
+  set tags=./tags;,tags;
 else
   set tags=./tags;
 endif
 
-" In Windows, if $VIM is not include in $PATH, .exe cannot be found.
 if !g:at_startup && g:is_windows && $PATH !~? '\(^\|;\)' . escape($VIM, '\\') . '\(;\|$\)'
   let $PATH .= ';' . $VIM
 endif
 
-" In Mac, default 'iskeyword' is incomplete for cp932.
 if g:is_mac
   set iskeyword=@,48-57,_,128-167,224-235
 endif
-" }}}
 
 " ------------------------------------------------------------------------------
 " CLPUM patch {{{
@@ -457,7 +438,7 @@ if g:is_cygwin
   endif
 endif
 
-set fileformats=dos,unix,mac
+set fileformats=unix,dos,mac
 if has('guess_encode')
   set fileencodings=guess,utf-16,utf-16le
 else
@@ -1333,7 +1314,11 @@ endif
 " ------------------------------------------------------------------------------
 " Setting for Visualize {{{
 " ------------------------------------------------------------------------------
-set ambiwidth=double
+if has('kaoriya')
+  set ambiwidth=auto
+else
+  set ambiwidth=double
+endif
 " Show invisible characters and define format of the characters.
 " Windows CUI (Command prompt) cannot recognize special characters.
 " So write a configuration for Windows-CUI and return from this function
