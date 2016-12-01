@@ -1541,11 +1541,11 @@ cnoremap <M-L>  <End>
 cnoremap <M-w>  <S-Right>
 cnoremap <M-b>  <S-Left>
 cnoremap <M-x>  <Del>
-" cnoremap <C-a>  <Home>
-" cnoremap <C-b>  <Left>
-" cnoremap <C-d>  <Del>
-" cnoremap <C-e>  <End>
-" cnoremap <C-f>  <Right>
+cnoremap <C-a>  <Home>
+cnoremap <C-b>  <Left>
+cnoremap <C-d>  <Del>
+cnoremap <C-e>  <End>
+cnoremap <C-f>  <Right>
 " cnoremap <C-n>  <Down>
 " cnoremap <C-p>  <Up>
 " cnoremap <M-b>  <S-Left>
