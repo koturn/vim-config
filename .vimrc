@@ -326,7 +326,7 @@ if has('cryptv')
     set cryptmethod=zip
   endif
 endif
-if has('clipboard')
+if has('clipboard') && !s:is_nvim
   if has('unnamedplus')
     set clipboard=unnamedplus,autoselect
     cnoremap <M-P>  <C-r>+
