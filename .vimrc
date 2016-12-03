@@ -585,12 +585,17 @@ if s:executable('xxd')
   command! -bar BinaryDecode  call s:decode_binary()
 endif
 
-function! s:clear_message() abort
-  for i in range(201)
-    echomsg ''
-  endfor
-endfunction
-command! -bar Clear  call s:clear_message()
+
+if v:version > 704 || (v:version == 704 && has('patch1738'))
+  command! -bar Clear  messages clear
+else
+  function! s:clear_message() abort
+    for i in range(201)
+      echomsg ''
+    endfor
+  endfunction
+  command! -bar Clear  call s:clear_message()
+endif
 
 function! s:messages_head(has_bang, ...) abort
   let n = a:0 > 0 ? a:1 : 10
