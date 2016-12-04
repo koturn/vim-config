@@ -1769,7 +1769,11 @@ command! -bar -nargs=+ -complete=customlist,s:dein_name_complete DeinUpdate  cal
 if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
   call dein#add('Shougo/dein.vim')
+  call dein#add('haya14busa/dein-command.vim', {
+        \ 'on_cmd': 'Dein'
+        \})
   call dein#add('vim-jp/vimdoc-ja')
+  call dein#add('ryunix/vim-wttrin')
   call dein#add('vim-jp/vital.vim', {
         \ 'on_cmd': 'Vitalize',
         \ 'on_func': 'vital'
@@ -1792,6 +1796,13 @@ if dein#load_state(s:deindir)
         \})
   call dein#add('Shougo/neosnippet-snippets')
   call dein#add('itchyny/lightline.vim')
+  call dein#add('Shougo/denite.nvim', {
+        \ 'on_cmd': [
+        \   'Denite',
+        \   'DeniteBufferDir',
+        \   'DeniteCursorWord'
+        \ ]
+        \})
   call dein#add('Shougo/unite.vim', {
         \ 'on_cmd': [
         \   'Unite',
@@ -2030,7 +2041,7 @@ if dein#load_state(s:deindir)
         \})
   call dein#add('mattn/emmet-vim', {
         \ 'on_cmd': ['EmmetInstall', 'Emmet'],
-        \ 'on_ft': ['html', 'css']
+        \ 'on_ft': ['html', 'css', 'markdown']
         \})
   call dein#add('tyru/eskk.vim', {
         \ 'on_map': [['nicl', '<Plug>(eskk:']]
@@ -2290,9 +2301,9 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('elzr/vim-json', {
         \ 'on_ft': 'json'
         \})
-  call dein#add('mitechie/pyflakes-pathogen', {
-        \ 'on_ft': 'python'
-        \})
+  " call dein#add('mitechie/pyflakes-pathogen', {
+  "       \ 'on_ft': 'python'
+  "       \})
   call dein#add('ruby-matchit', {
         \ 'on_ft': 'ruby'
         \})
@@ -2456,7 +2467,7 @@ call dein#add('mopp/makecomp.vim', {
         \   'MilqiKoTemplate',
         \   'FZFKoTemplate',
         \ ],
-        \ 'on_source': 'unite.vim',
+        \ 'on_source': ['unite.vim', 'denite.nvim'],
         \ 'on_func': 'kotemplate'
         \})
   call dein#add('koturn/vim-mplayer', {
@@ -2492,7 +2503,7 @@ call dein#add('mopp/makecomp.vim', {
         \   'MPlayerHelp',
         \   'MPlayerFlush'
         \ ],
-        \ 'on_source': 'unite.vim',
+        \ 'on_source': ['unite.vim', 'denite.nvim'],
         \})
   call dein#add('koturn/movewin.vim', {
         \ 'on_cmd': ['MoveWin', 'MoveWinLeft', 'MoveWinDown', 'MoveWinUp', 'MoveWinRight'],
@@ -2510,6 +2521,16 @@ call dein#add('mopp/makecomp.vim', {
         \})
   call dein#add('koturn/vim-themostdangerouswritingapp', {
         \ 'on_cmd': ['TheMostDangerousWritingAppEnable', 'TheMostDangerousWritingAppDisable']
+        \})
+  call dein#add('koturn/vim-podcast', {
+        \ 'depends': ['vim-mplayer', 'denite.nvim', 'unite.vim', 'ctrlp.vim', 'alti.vim'],
+        \ 'on_cmd': [
+        \   'PodcastStop',
+        \   'PodcastUpdate',
+        \   'CtrlPPodcast',
+        \   'AltiPodcast',
+        \ ],
+        \ 'on_source': ['denite.nvim', 'unite.vim']
         \})
   call dein#add('koturn/vim-rebuildfm', {
         \ 'on_cmd': [
@@ -2838,7 +2859,7 @@ endif
 
 if dein#tap('emmet-vim')
   let g:user_emmet_install_global = 0
-  autocmd MyAutoCmd FileType html,css  EmmetInstall
+  autocmd MyAutoCmd FileType html,css,markdown  EmmetInstall
 endif
 
 if dein#tap('eskk.vim')
@@ -3426,6 +3447,10 @@ if dein#tap('vim-resizewin')
   map! <S-Up>     <Plug>(resizewin-contract-lines)
   map  <S-Right>  <Plug>(resizewin-expand-columns)
   map! <S-Right>  <Plug>(resizewin-expand-columns)
+endif
+
+if dein#tap('vim-podcast')
+  let podcast#verbose = 1
 endif
 
 if dein#tap('vim-rebuildfm')
