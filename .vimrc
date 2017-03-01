@@ -223,6 +223,9 @@ set pastetoggle=<F10>
 set helplang=ja
 set shortmess& shortmess+=I
 set shellslash
+if g:is_windows
+  set noshelltemp
+endif
 set virtualedit=block
 set autoread
 set nowrap
@@ -246,7 +249,6 @@ if has('persistent_undo')
 endif
 set hidden
 set switchbuf=useopen,usetab
-" Settng for C-a adding and C-x subtracting.
 set more
 set formatoptions=nroqB
 if v:version >= 704
@@ -266,15 +268,14 @@ else
   set timeoutlen=500
   set ttimeoutlen=100
 endif
-" Indent settings
 set autoindent smartindent
 set expandtab smarttab
 set shiftwidth=2 tabstop=2 softtabstop=-1
 set shiftround
 set copyindent
-" Show line number.
 " set number
 set updatetime=1500
+set maxfuncdepth=10000
 " title
 " set title
 " set titlelen=95
@@ -294,12 +295,9 @@ if s:executable('firefox')
 else
   set keywordprg=:help
 endif
-" spell check language
 set spelllang=en,cjk
-" complete
 set completeopt=menu,preview
 set showfulltag
-" Setting for grep
 if s:executable('ag')
   set grepprg=ag\ --nogroup\ -iS
   set grepformat=%f:%l:%m
@@ -312,9 +310,9 @@ elseif s:executable('grep')
 else
   set grepprg=internal
 endif
-" Setting for printing.
 if has('printer') && g:is_windows
-  set printoptions=number:y,header:0,syntax:y,left:5pt,right:5pt,top:10pt,bottom:10pt
+  set printheader=%t%=%N
+  set printoptions=number:y,header:2,syntax:y,left:20pt,right:20pt,top:28pt,bottom:28pt
   set printfont=Consolas:h8 printmbfont=r:MS_Gothic:h8,a:yes
 endif
 if has('cryptv')
@@ -440,9 +438,9 @@ endif
 
 set fileformats=unix,dos,mac
 if has('guess_encode')
-  set fileencodings=guess,utf-16,utf-16le
+  set fileencodings=guess,ucs-2le,ucs-2,utf-16le,utf-16
 else
-  set fileencodings=iso-2022-jp,ucs-bom,utf-8,euc-jp,cp932,utf-16,utf-16le
+  set fileencodings=iso-2022-jp,ucs-bom,utf-8,euc-jp,cp932,ucs-2le,ucs-2,utf-16le,utf-16
 endif
 set matchpairs& matchpairs+=（:）,｛:｝,「:」,『:』
 
@@ -1365,7 +1363,7 @@ augroup MyAutoCmd
   " au VimEnter,WinEnter,BufRead * match WhitespaceEOL / \+$/
 
   au ColorScheme * hi TabEOL term=underline ctermbg=DarkGreen guibg=DarkGreen
-  au VimEnter,WinEnter * call s:matchadd('TabEOL', '\t\+$')
+  au VimEnter,WinEnter,BufRead * call s:matchadd('TabEOL', '\t\+$')
   " au VimEnter,WinEnter,BufRead * match TabEOL /\t\+$/
 
   au ColorScheme * hi SpaceTab term=underline ctermbg=Magenta guibg=Magenta guisp=Magenta
@@ -2735,7 +2733,7 @@ if dein#tap('neosnippet')
   let g:neosnippet#expand_word_boundary = 1
   if has('conceal')
     " set conceallevel=2 concealcursor=i
-    set conceallevel=0
+    set conceallevel=0 concealcursor=incv
   endif
 endif
 

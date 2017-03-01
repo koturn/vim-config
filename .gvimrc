@@ -66,10 +66,7 @@ endif
 " Setting written in gvimrc of KaoriYa-vim
 " ------------------------------------------------------------
 set linespace=1
-" Disable auto focus with mouse moving.
-set nomousefocus
-" Hide mouse-pointer when you input.
-set mousehide
+set mousehide nomousefocus
 
 
 
