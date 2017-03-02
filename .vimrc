@@ -1340,21 +1340,21 @@ call s:set_listchars()
 delfunction s:set_listchars
 
 function! s:matchadd(group, pattern, ...) abort
-  if index(map(getmatches(), 'v:val.group'), a:group) != -1
+  if index(map(getmatches(), 'v:val.group'), a:group) != -1 || expand('%:h:t') ==# 'doc'
     return
   endif
   call call('matchadd', extend([a:group, a:pattern], a:000))
 endfunction
-" function! s:matchdelete(groups) abort
-"   let groups = type(a:groups) == type('') ? [a:groups] : a:groups
-"   for group in groups
-"     let matches = getmatches()
-"     let idx = index(map(copy(matches), 'v:val.group'), group)
-"     if idx != -1
-"       call matchdelete(matches[idx].id)
-"     endif
-"   endfor
-" endfunction
+function! s:matchdelete(groups) abort
+  let groups = type(a:groups) == type('') ? [a:groups] : a:groups
+  for group in groups
+    let matches = getmatches()
+    let idx = index(map(copy(matches), 'v:val.group'), group)
+    if idx != -1
+      call matchdelete(matches[idx].id)
+    endif
+  endfor
+endfunction
 
 augroup MyAutoCmd
   " TODO
@@ -1792,7 +1792,6 @@ if dein#load_state(s:deindir)
   call dein#add('thinca/vim-localrc', {
         \ 'if': '!g:is_cygwin'
         \})
-  call dein#add('Shougo/neosnippet-snippets')
   call dein#add('itchyny/lightline.vim')
   call dein#add('Shougo/denite.nvim', {
         \ 'on_cmd': [
@@ -1895,6 +1894,7 @@ if dein#load_state(s:deindir)
         \ 'on_ft': 'neosnippet',
         \ 'on_map': [['nisx', '<Plug>(neosnippet_']],
         \})
+  call dein#add('Shougo/neosnippet-snippets')
   call dein#add('Shougo/vimshell', {
         \ 'depends': 'vimproc.vim',
         \ 'on_cmd': [
@@ -2307,7 +2307,7 @@ call dein#add('mopp/makecomp.vim', {
         \})
   call dein#add('losingkeys/vim-niji', {
       \ 'on_ft': ['lisp', 'scheme', 'clojure'],
-      \ 'on_path': ['\.lisp$', '\.scheme$', '\.clojure$'],
+      \ 'on_path': ['\.lisp$', '\.scm$', '\.clojure$'],
       \})
   call dein#add('vim-scripts/gnuplot.vim', {
         \ 'on_ft': 'gnuplot'
@@ -2396,6 +2396,9 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('katono/rogue.vim', {
         \ 'on_cmd': ['Rogue', 'RogueRestore', 'RogueResume', 'RogueScores']
         \})
+  call dein#add('christianrondeau/vimcastle', {
+        \ 'on_cmd': 'Vimcastle'
+        \})
   call dein#add('thinca/vim-threes', {
         \ 'on_cmd': ['ThreesStart', 'ThreesShowRecord']
         \})
@@ -2445,6 +2448,9 @@ call dein#add('mopp/makecomp.vim', {
         \})
   call dein#add('koturn/vim-clipboard', {
         \ 'on_cmd': ['GetClip', 'PutClip']
+        \})
+  call dein#add('koturn/vim-replica', {
+        \ 'on_cmd': ['Replica', 'ReplicaInternal']
         \})
   call dein#add('koturn/weather.vim', {
         \ 'on_cmd': 'Weather'
@@ -2955,32 +2961,10 @@ endif
 
 if dein#tap('vim-quickrun')
   function! s:quickrun_on_source() abort
-    " call pluginconfig#quickrun()
-    " delfunction pluginconfig#quickrun
-    call dein#source('vimproc.vim')
-    let g:quickrun_config = {
-          \ '_' : {
-          \   'outputter': 'buffer',
-          \   'outputter/buffer/split': ':botright',
-          \   'runner': 'vimproc',
-          \   'outputter/buffer/close_on_empty': 1,
-          \   'runner/vimproc/updatetime': 60,
-          \   'hook/shebang/enable': !g:is_windows
-          \ },
-          \}
+    call pluginconfig#quickrun()
+    delfunction pluginconfig#quickrun
     nnoremap <expr><silent><C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
     nnoremap <Leader>r  :<C-u>QuickRun -exec '%C %S'<CR>
-    let g:quickrun_config.cpp = {
-          \ 'outputter': 'quickfix',
-          \ 'command': 'g++',
-          \ 'cmdopt': '-Wall -Wextra',
-          \ 'exec': '%C %o %S',
-          \}
-    let g:quickrun_config.make = {
-          \ 'outputter': 'error:buffer:quickfix',
-          \ 'command': 'make',
-          \ 'exec': '%c %o'
-          \}
   endfunction
   call dein#set_hook(g:dein#name, 'hook_source', function('s:quickrun_on_source'))
 endif
@@ -3341,13 +3325,14 @@ if dein#tap('vim-kotemplate')
           \   'cpp': ['*.{c,cc,cpp,cxx,h,hpp}'],
           \   'cs': ['*.cs'],
           \   'go': ['*.go'],
+          \   'kuin': ['*.kn'],
           \   'lua': ['*.lua'],
           \   'lisp': ['*.lisp'],
           \   'scheme': ['*.scm'],
           \   'html': ['*.html'],
           \   'java': ['*.java'],
           \   'javascript': ['*.js'],
-          \   'make': ['Makefile/*', 'Makefile'],
+          \   'make': ['Makefile/*', 'Makefile', '*.mk'],
           \   'markdown': ['*.md'],
           \   'perl': ['*.perl'],
           \   'php': ['*.php'],
@@ -3404,6 +3389,13 @@ if dein#tap('vim-kotemplate')
           \   'main.js': 'JavaScript/electron.js',
           \   'release.js': 'JavaScript/electron_release.js',
           \   'package.json': 'Json/electron_package.json'
+          \ }, 'qt': {
+          \   'main.cpp': 'Cpp/Qt/main.cpp',
+          \   'MainWindow.cpp': 'Cpp/Qt/MainWindow.cpp',
+          \   'MainWindow.h': 'Cpp/Qt/MainWindow.h',
+          \   'MainWindow.ui': 'QtFiles/MainWindow.ui',
+          \   'Template.pro': 'QtFiles/Project.pro',
+          \   '.gitignore': 'gitfile/qt.gitignore'
           \ }
           \}
   endfunction

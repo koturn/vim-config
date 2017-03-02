@@ -2,77 +2,86 @@ let s:save_cpo = &cpo
 set cpo&vim
 scriptencoding utf-8
 
+
 function! pluginconfig#quickrun() abort
   let g:quickrun_config = {
-        \ '_' : {
-        \   'outputter' : 'buffer',
-        \   'outputter/buffer/split' : ':botright',
-        \   'runner' : 'vimproc',
-        \   'outputter/buffer/close_on_empty' : 1,
-        \   'runner/vimproc/updatetime' : 60,
+        \ '_': {
+        \   'outputter': 'error',
+        \   'outputter/error': 'quickfix',
+        \   'outputter/error/success': 'buffer',
+        \   'outputter/buffer/split': ':botright',
+        \   'runner': 'job',
+        \   'outputter/buffer/close_on_empty': 1,
+        \   'hook/shebang/enable': !has('win32') && !has('win64')
         \ },
-        \ 'c'      : {'type' : 'my_c'},
-        \ 'cpp'    : {'type' : 'my_cpp'},
-        \ 'cs'     : {'type' : 'my_cs'},
-        \ 'java'   : {'type' : 'my_java'},
-        \ 'lisp'   : {'type' : 'my_lisp'},
-        \ 'html'   : {'type' : 'my_html'},
-        \ 'scheme' : {'type' : 'my_scheme'},
-        \ 'python' : {'type' : 'my_python'},
-        \ 'ruby'   : {'type' : 'my_ruby'},
-        \ 'r'      : {'type' : 'my_r'},
-        \ 'tex'    : {'type' : 'my_tex'},
-        \ 'kuin' : {
-        \   'command' : 'Kuin.exe',
-        \   'cmdopt'  : '-nw',
-        \   'exec'    : '%C %S %o',
+        \ 'c': {
+        \   'outputter': 'quickfix',
+        \   'command': 'gcc',
+        \   'cmdopt': '-Wall -Wextra -fsyntax-only',
+        \   'exec': '%C %o %S'
         \ },
-        \ 'my_c' : {
-        \   'outputter' : 'quickfix',
-        \   'command' : 'gcc',
-        \   'cmdopt'  : '-Wall -Wextra -fsyntax-only',
-        \   'exec'    : '%C %o %S',
-        \ }, 'my_cpp' : {
-        \   'outputter' : 'quickfix',
-        \   'command' : 'g++',
-        \   'cmdopt'  : '-Wall -Wextra -fsyntax-only',
-        \   'exec'    : '%C %o %S',
-        \ }, 'my_cs' : {
-        \   'command' : 'csc',
-        \   'cmdopt'  : '/out:csOut.exe',
-        \   'exec'    : '%C %o %S',
-        \ }, 'my_java' : {
-        \   'command' : 'javac',
-        \   'exec'    : '%C %S',
-        \ }, 'my_lisp' : {
-        \   'command' : 'clisp',
-        \   'exec'    : '%C %S',
-        \ }, 'my_html' : {
-        \   'outputter' : 'browser',
-        \   'command' : 'open',
-        \   'exec'    : '%C %S',
-        \ }, 'my_scheme' : {
-        \   'command' : 'gosh',
-        \   'exec'    : '%C %S',
-        \ }, 'my_python' : {
-        \   'command' : 'python',
-        \   'exec'    : '%C %S',
-        \ }, 'my_ruby' : {
-        \   'command' : 'ruby',
-        \   'exec'    : '%C %S',
-        \ }, 'my_r' : {
-        \   'command' : 'Rscript',
-        \   'exec'    : '%C %S',
-        \ }, 'my_tex' : {
-        \   'command' : 'platex',
-        \   'exec'    : '%C %S',
-        \}}
-  let g:quickrun_config._['hook/shebang/enable'] = !g:is_windows
+        \ 'cpp': {
+        \   'outputter': 'quickfix',
+        \   'command': 'g++',
+        \   'cmdopt': '-Wall -Wextra -fsyntax-only',
+        \   'exec': '%C %o %S'
+        \ },
+        \ 'cs': {
+        \   'command': 'csc',
+        \   'cmdopt': '/out:quickrunOutput.exe',
+        \   'exec': '%C %o %S',
+        \ },
+        \ 'kuin': {
+        \   'command': 'kuincl',
+        \   'cmdopt': '-e cui -r',
+        \   'exec': ['%C -i %S -o quickrunOutput.exe %o', 'quickrunOutput.exe'],
+        \   'hook/output_encode/enable': 1,
+        \   'hook/output_encode/encoding': &termencoding,
+        \ },
+        \
+        \ 'lisp': executable('sbcl') ? {
+        \   'command': 'sbcl',
+        \   'exec': '%C --script %S',
+        \ } : {
+        \   'command': 'clisp',
+        \   'exec': '%C %S',
+        \ },
+        \ 'html': {
+        \   'outputter': 'browser',
+        \   'command': 'open',
+        \   'exec': '%C %S',
+        \ },
+        \ 'scheme': {
+        \   'command': executable('gosh') ? 'gosh' : 'guile',
+        \   'exec': '%C %S',
+        \ },
+        \ 'python': {
+        \   'command': 'python',
+        \   'exec': '%C %S',
+        \ },
+        \ 'ruby': {
+        \   'command': 'ruby',
+        \   'exec': '%C %S',
+        \ },
+        \ 'r': {
+        \   'command': 'Rscript',
+        \   'exec': '%C %S',
+        \ },
+        \ 'tex': {
+        \   'command': 'platex',
+        \   'exec': '%C %S',
+        \ },
+        \ 'make': {
+        \   'outputter': 'error:buffer:quickfix',
+        \   'command': 'make',
+        \   'exec': '%c %o'
+        \ }
+        \}
   nnoremap <expr><silent><C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
   nnoremap <Leader>r  :<C-u>QuickRun -exec '%C %S'<CR>
-  " \ }, 'html' : {
-  " \   'command'   : 'cat',
-  " \   'outputter' : 'browser',
+  " \ }, 'html': {
+  " \   'command': 'cat',
+  " \   'outputter': 'browser',
 endfunction
 
 function! pluginconfig#ref() abort
