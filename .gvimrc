@@ -17,8 +17,7 @@ if has('kaoriya')
 else
   set guioptions=
 endif
-set winaltkeys=no  " Turns off the Alt key bindings to the gui menu
-set cursorline cursorcolumn
+set winaltkeys=no
 set guicursor+=a:blinkon0
 
 " function! s:get_sid_prefix() abort
@@ -38,11 +37,9 @@ set guicursor+=a:blinkon0
 " let &balloonexpr = s:sid_prefix . 'balloon_expr()'
 " set ballooneval
 
-" Change cursor color depending on state of IME.
 if has('multi_byte_ime') || has('xim')
   autocmd MyAutoCmd Colorscheme * hi CursorIM guifg=NONE guibg=Orange
-  " Default state of IME on insert mode and searching mode.
-  set iminsert=0 imsearch=0  " for no KaoriYa WIN gvim
+  set iminsert=0 imsearch=0
 endif
 
 if exists('+antialias')
@@ -50,8 +47,9 @@ if exists('+antialias')
 endif
 
 if g:is_windows
-  set guifont=Consolas:h9 guifontwide=MS_Gothic:h9
-  """ Setting for menubar
+  set guifont=Ricty_Diminished_Discord:h10,Consolas:h10
+  set guifontwide=Ricty_Diminished_Discord:h10,MS_Gothic:h9
+  set renderoptions=type:directx,renmode:5
   " set langmenu=ja_jp.utf-8
   " source $VIMRUNTIME/delmenu.vim
   " source $VIMRUNTIME/menu.vim
