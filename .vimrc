@@ -1387,8 +1387,9 @@ augroup MyAutoCmd
   " Setting for indent.
   " ----------------------------------------------------------------------------
   au Filetype awk        setlocal                      cindent cinkeys-=0#
-  au Filetype c          setlocal                      cindent cinoptions& cinoptions+=g0,N-s cinkeys-=0#
-  au Filetype cpp        setlocal                      cindent cinoptions& cinoptions+=g0,N-s cinkeys-=0#
+  au Filetype c          setlocal                      cindent cinoptions& cinoptions+=g0,l0,N-s,t0 cinkeys-=0#
+  au Filetype cpp        setlocal                      cindent cinoptions& cinoptions+=g0,j1,l0,N-s,t0,ws,Ws,(0 cinkeys-=0#
+  " )
   au Filetype cs         setlocal sw=4 ts=4 sts=4 noet
   au Filetype java       setlocal sw=4 ts=4 sts=4 noet cindent cinoptions& cinoptions+=j1
   au Filetype javascript setlocal sw=2 ts=2 sts=2      cindent cinoptions& cinoptions+=j1,J1,(s
@@ -1788,6 +1789,9 @@ if dein#load_state(s:deindir)
         \ 'on_func': 'vimproc'
         \})
   unlet s:cflags
+  call dein#add('editorconfig/editorconfig-vim', {
+        \ 'lazy': 0
+        \})
   call dein#add('Yggdroot/indentLine')
   call dein#add('thinca/vim-localrc', {
         \ 'if': '!g:is_cygwin'
