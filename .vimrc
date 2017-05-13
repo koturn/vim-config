@@ -2208,7 +2208,7 @@ if dein#load_state(s:deindir)
   call dein#add('vim-scripts/DoxygenToolkit.vim', {
         \ 'on_cmd': ['Dox', 'DoxLic', 'DoxAuthor', 'DoxUndoc', 'DoxBlock']
         \})
-  call dein#add('tagexplorer.vim', {
+  call dein#add('vim-scripts/tagexplorer.vim', {
         \ 'if': executable('ctags'),
         \ 'on_ft': ['cpp', 'java', 'perl', 'python', 'ruby', 'tags'],
         \ 'on_cmd': 'TagExplorer'
@@ -2276,10 +2276,10 @@ call dein#add('mopp/makecomp.vim', {
   "       \ 'on_map': [['i', '<Plug>(marching_']],
   "       \ 'on_ft': ['c', 'cpp']
   "       \})
-  call dein#add('java_getset.vim', {
+  call dein#add('vim-scripts/java_getset.vim', {
         \ 'on_ft': 'java'
         \})
-  call dein#add('jcommenter.vim', {
+  call dein#add('vim-scripts/jcommenter.vim', {
         \ 'on_ft': 'java'
         \})
   call dein#add('osyo-manga/vim-snowdrop', {
@@ -2306,7 +2306,7 @@ call dein#add('mopp/makecomp.vim', {
   " call dein#add('mitechie/pyflakes-pathogen', {
   "       \ 'on_ft': 'python'
   "       \})
-  call dein#add('ruby-matchit', {
+  call dein#add('vim-scripts/ruby-matchit', {
         \ 'on_ft': 'ruby'
         \})
   call dein#add('losingkeys/vim-niji', {
