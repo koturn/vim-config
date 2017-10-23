@@ -1852,8 +1852,18 @@ if dein#load_state(s:deindir)
         \   'VimFilerWrite',
         \ ]
         \})
+  call dein#add('roxma/nvim-yarp', {
+        \ 'if': !has('nvim') && !has('win32') && !has('win32unix') && v:version >= 704
+        \})
+  call dein#add('roxma/vim-hug-neovim-rpc', {
+        \ 'if': !has('nvim') && !has('win32') && !has('win32unix') && v:version >= 704
+        \})
+  call dein#add('Shougo/deoplete.nvim', {
+        \ 'if': has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704,
+        \ 'on_event': 'InsertEnter'
+        \})
   call dein#add('Shougo/neocomplete.vim', {
-        \ 'if': has('lua') && (v:version > 703 || (v:version == 703 && has('patch885'))),
+        \ 'if': !(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && has('lua') && (v:version > 703 || (v:version == 703 && has('patch885'))),
         \ 'on_event': 'InsertEnter',
         \ 'on_cmd': [
         \   'NeoCompleteEnable',
@@ -1870,7 +1880,7 @@ if dein#load_state(s:deindir)
         \ ]
         \})
   call dein#add('Shougo/neocomplcache', {
-        \ 'if': !(has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))),
+        \ 'if': !(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && !(has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))),
         \ 'on_event': 'InsertEnter',
         \ 'on_cmd': [
         \   'NeoComplCacheEnable',
@@ -1887,7 +1897,6 @@ if dein#load_state(s:deindir)
         \ 'on_map': [['is', '<Plug>(neocomplcache_snippets_']]
         \})
   call dein#add('Shougo/neosnippet', {
-        \ 'depends': (has('lua') && (v:version > 703 || (v:version == 703 && has('patch885'))) ? 'neocomplete.vim' : 'neocomplcache'),
         \ 'on_event': 'InsertEnter',
         \ 'on_cmd': [
         \   'NeoSnippetEdit',
@@ -1919,7 +1928,8 @@ if dein#load_state(s:deindir)
   call dein#add('Shougo/vinarise', {
         \ 'on_cmd': [
         \   'Vinarise',
-        \   'VinariseDump'
+        \   'VinarisePluginBitmapView',
+        \   'VinarisePluginDump'
         \ ]
         \})
   call dein#add('ujihisa/vimshell-ssh', {
@@ -2186,6 +2196,9 @@ if dein#load_state(s:deindir)
         \   'AgitFile'
         \ ]
         \})
+  call dein#add('lambdalisue/gina.vim', {
+        \ 'on_cmd': 'Gina'
+        \})
   call dein#add('mattn/gist-vim', {
         \ 'depends': 'webapi-vim',
         \ 'on_cmd': 'Gist'
@@ -2318,6 +2331,9 @@ call dein#add('mopp/makecomp.vim', {
         \})
   call dein#add('tatt61880/kuin_vim', {
         \ 'on_ft': 'kuin'
+        \})
+  call dein#add('brgmnn/vim-opencl', {
+        \ 'on_ft': 'opencl'
         \})
   call dein#add('lilydjwg/colorizer')
   call dein#add('junegunn/goyo.vim', {
@@ -2709,6 +2725,9 @@ if dein#tap('unite.vim')
   nnoremap [unite]M   :<C-u>Unite mplayer
 endif
 
+if dein#tap('deoplete.nvim')
+  let g:deoplete#enable_at_startup = 1
+endif
 if dein#tap('neocomplete.vim')
   " inoremap <expr><CR>  neocomplete#smart_close_popup() . "\<CR>"
   " inoremap <expr><CR>  pumvisible() ? neocomplete#smart_close_popup() . "\<CR>" : "\<CR>"
@@ -3350,7 +3369,7 @@ if dein#tap('vim-kotemplate')
           \}
     let g:kotemplate#enable_autocmd = 1
     let g:kotemplate#auto_filetypes = keys(g:kotemplate#filter.pattern)
-    let g:kotemplate#autocmd_function = 'ctrlp'
+    let g:kotemplate#autocmd_function = 'unite'
     " let g:kotemplate#autocmd_function = 'unite'
     let g:kotemplate#dir = '~/github/kotemplate/'
     let g:kotemplate#tag_actions = [{
