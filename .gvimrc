@@ -11,35 +11,39 @@
 " ------------------------------------------------------------
 " Basic settings
 " ------------------------------------------------------------
+scriptencoding utf-8
 let g:did_install_default_menus = 1
 if has('kaoriya')
   set guioptions=
 else
   set guioptions=
 endif
-set winaltkeys=no
+set winaltkeys=no  " Turns off the Alt key bindings to the gui menu
+set cursorline cursorcolumn
 set guicursor+=a:blinkon0
 
-" function! s:get_sid_prefix() abort
-"   return matchstr(expand('<sfile>'), '^function \zs<SNR>\d\+_\zeget_sid_prefix$')
-" endfun
-" let s:sid_prefix = s:get_sid_prefix()
-" delfunction s:get_sid_prefix
+function! s:get_sid_prefix() abort
+  return matchstr(expand('<sfile>'), '^function \zs<SNR>\d\+_\zeget_sid_prefix$')
+endfun
+let s:sid_prefix = s:get_sid_prefix()
+delfunction s:get_sid_prefix
 
-" function! s:balloon_expr() abort
-"   let lnum = foldclosed(v:beval_lnum)
-"   if lnum == -1
-"     return ''
-"   endif
-"   let lines = getline(lnum, foldclosedend(lnum))
-"   return iconv(join(len(lines) > &lines ? lines[: &lines] : lines, "\n"), &enc, &tenc)
-" endfunction
-" let &balloonexpr = s:sid_prefix . 'balloon_expr()'
-" set ballooneval
+function! s:balloon_expr() abort
+  let lnum = foldclosed(v:beval_lnum)
+  if lnum == -1
+    return ''
+  endif
+  let lines = getline(lnum, foldclosedend(lnum))
+  return iconv(join(len(lines) > &lines ? lines[: &lines] : lines, "\n"), &enc, &tenc)
+endfunction
+let &g:balloonexpr = s:sid_prefix . 'balloon_expr()'
+set ballooneval
 
+" Change cursor color depending on state of IME.
 if has('multi_byte_ime') || has('xim')
   autocmd MyAutoCmd Colorscheme * hi CursorIM guifg=NONE guibg=Orange
-  set iminsert=0 imsearch=0
+  " Default state of IME on insert mode and searching mode.
+  set iminsert=0 imsearch=0  " for no KaoriYa WIN gvim
 endif
 
 if exists('+antialias')
@@ -47,8 +51,7 @@ if exists('+antialias')
 endif
 
 if g:is_windows
-  set guifont=Ricty_Diminished_Discord:h10,Consolas:h10
-  set guifontwide=Ricty_Diminished_Discord:h10,MS_Gothic:h9
+  set guifont=Ricty_Diminished_Discord_for_Po:h10:qANTIALIASED,Consolas:h10:qANTIALIASED guifontwide=Ricty_Diminished_Discord_for_Po:h10:qANTIALIASED,MS_Gothic:h9:qANTIALIASED
   set renderoptions=type:directx,renmode:5
   " set langmenu=ja_jp.utf-8
   " source $VIMRUNTIME/delmenu.vim
@@ -57,6 +60,9 @@ elseif has('xfontset')
   set guifontset=a14,r14,k14
 elseif g:is_mac
   set guifont=Osaka-Mono:h14
+else
+  set guifont=Ricty\ Diminished\ for\ Powerline\ 10
+  set guifontwide=Ricty\ Diminished\ for\ Powerline\ 10
 endif
 
 

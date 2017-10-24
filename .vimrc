@@ -201,7 +201,11 @@ autocmd MyAutoCmd CursorMoved,CursorMovedI * call s:timer_used.start()
 " autocmd MyAutoCmd CursorMoved,CursorMovedI * call s:timer_used.wakeup()
 
 " }}}
-
+let g:aref_web_source = {
+\  'stackage' : {
+\    'url' : 'https://www.stackage.org/lts-6.6/hoogle?q=%s&page=1'
+\  }
+\}
 " ------------------------------------------------------------------------------
 " Basic settings {{{
 " ------------------------------------------------------------------------------
@@ -227,7 +231,7 @@ if g:is_windows
   set noshelltemp
 endif
 set virtualedit=block
-set autoread
+setglobal autoread
 set nowrap
 if exists('+breakindent')
   set breakindent breakindentopt=min:40,shift:-1
@@ -242,7 +246,7 @@ set smartcase
 set whichwrap=b,s,h,l,<,>,[,]
 set visualbell t_vb=
 set belloff=all
-set lazyredraw
+" set lazyredraw
 set viminfo= noswapfile nobackup nowritebackup
 if has('persistent_undo')
   set noundofile
@@ -291,37 +295,38 @@ if s:executable('man')
 endif
 autocmd MyAutoCmd FileType help,vim  setlocal keywordprg=:help
 if s:executable('firefox')
-  set keywordprg=firefox\ -search
+  setglobal keywordprg=firefox\ -search
 else
-  set keywordprg=:help
+  setglobal keywordprg=:help
 endif
 set spelllang=en,cjk
 set completeopt=menu,preview
 set showfulltag
 if s:executable('ag')
-  set grepprg=ag\ --nogroup\ -iS
+  setglobal grepprg=ag\ --nogroup\ -iS
   set grepformat=%f:%l:%m
 elseif s:executable('ack')
-  set grepprg=ack\ --nogroup
+  setglobal grepprg=ack\ --nogroup
   set grepformat=%f:%l:%m
 elseif s:executable('grep')
-  set grepprg=grep\ -Hnd\ skip\ -r
+  setglobal grepprg=grep\ -Hnd\ skip\ -r
   set grepformat=%f:%l:%m,%f:%l%m,%f\ \ %l%m
 else
-  set grepprg=internal
+  setglobal grepprg=internal
 endif
 if has('printer') && g:is_windows
   set printheader=%t%=%N
   set printoptions=number:y,header:2,syntax:y,left:20pt,right:20pt,top:28pt,bottom:28pt
-  set printfont=Consolas:h8 printmbfont=r:MS_Gothic:h8,a:yes
+  " set printfont=Consolas:h8 printmbfont=r:MS_Gothic:h8,a:yes
+  set printfont=Ricty_Diminished_Discord:h10 printmbfont=r:Ricty_Diminished_Discord:h10,a:yes
 endif
 if has('cryptv')
   if v:version > 704 || v:version == 704 && has('patch399')
-    set cryptmethod=blowfish2
+    setglobal cryptmethod=blowfish2
   elseif v:version >= 703
-    set cryptmethod=blowfish
+    setglobal cryptmethod=blowfish
   else
-    set cryptmethod=zip
+    setglobal cryptmethod=zip
   endif
 endif
 if has('clipboard') && !s:is_nvim
@@ -369,9 +374,9 @@ if &t_Co > 2 || !s:is_cui
   set hlsearch
 endif
 if filereadable($HOME . '/.vimrc') && filereadable($HOME . '/.ViMrC')
-  set tags=./tags;,tags;
+  setglobal tags=./tags;,tags;
 else
-  set tags=./tags;
+  setglobal tags=./tags;
 endif
 
 if !g:at_startup && g:is_windows && $PATH !~? '\(^\|;\)' . escape($VIM, '\\') . '\(;\|$\)'
@@ -411,6 +416,20 @@ if g:is_windows
   set tenc=cp932
 endif
 
+
+let s:t_codes = {
+      \ 'ti': &t_ti,
+      \ 'SI': &t_SI,
+      \ 'EI': &t_EI,
+      \ 'te': &t_te
+      \}
+function! s:set_term_mintty() abort
+  let &t_ti = s:t_codes.ti . "\e[2 q"
+  let &t_SI = s:t_codes.SI . "\e[6 q"
+  let &t_EI = s:t_codes.EI . "\e[2 q"
+  let &t_te = s:t_codes.te . "\e[0 q"
+endfunction
+
 if g:is_cygwin
   set enc =utf-8
   set fenc=utf-8
@@ -420,10 +439,7 @@ if g:is_cygwin
   endif
   if &term !=# 'cygwin'  " not in command prompt
     " Change cursor shape depending on mode.
-    let &t_ti .= "\e[2 q"
-    let &t_SI .= "\e[6 q"
-    let &t_EI .= "\e[2 q"
-    let &t_te .= "\e[0 q"
+    call s:set_term_mintty()
 
     " 縦分割スクロール高速化
     " http://www.youtube.com/watch?v=KQfOArRJkYI
@@ -437,6 +453,9 @@ if g:is_cygwin
 endif
 
 set fileformats=unix,dos,mac
+if g:is_windows
+  set makeencoding=cp932
+endif
 if has('guess_encode')
   set fileencodings=guess,ucs-2le,ucs-2,utf-16le,utf-16
 else
@@ -486,6 +505,18 @@ function! s:system(cmd) abort
   catch /^Vim(call)\=:E117: .\+: vimproc#cmd#system$/
     return system(a:cmd)
   endtry
+endfunction
+
+function! s:_system(cmd) abort
+  let out = ''
+  let job = job_start([&shell, &shellcmdflag, a:cmd], {
+        \ 'out_cb': {ch, msg -> [execute("let out .= msg"), out]},
+        \ 'out_mode': 'raw'
+        \})
+  while job_status(job) ==# 'run'
+    sleep 1m
+  endwhile
+  return out
 endfunction
 
 function! s:redir(cmd) abort
@@ -1768,6 +1799,16 @@ command! -bar -nargs=+ -complete=customlist,s:dein_name_complete DeinUpdate  cal
 if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
   call dein#add('Shougo/dein.vim')
+  " call dein#add('OmniSharp/omnisharp-vim', {
+  "     \ 'lazy': 0,
+  "     \ 'on_ft': 'cs'
+  "     \})
+  call dein#add('y0za/vim-udon-araisan', {
+        \ 'lazy': 0
+        \})
+  call dein#add('koturn/nvim-denite-sample', {
+        \ 'on_source': 'denite.nvim'
+        \})
   call dein#add('haya14busa/dein-command.vim', {
         \ 'on_cmd': 'Dein'
         \})
@@ -1953,9 +1994,9 @@ if dein#load_state(s:deindir)
   call dein#add('gregsexton/VimCalc', {
         \ 'on_cmd': 'Calc'
         \})
-  call dein#add('haya14busa/incsearch.vim', {
-        \ 'on_map': [['nvo', '<Plug>(incsearch-']]
-        \})
+  " call dein#add('haya14busa/incsearch.vim', {
+  "       \ 'on_map': [['nvo', '<Plug>(incsearch-']]
+  "       \})
   call dein#add('jceb/vim-hier', {
         \ 'on_cmd': ['HierUpdate', 'HierClear', 'HierStart', 'HierStop'],
         \ 'on_ft': 'qf'
@@ -2069,6 +2110,10 @@ if dein#load_state(s:deindir)
         \ 'depends': 'vimproc.vim',
         \ 'on_cmd': 'Ref',
         \ 'on_map': [['nv', '<Plug>(ref-keyword)']]
+        \})
+  call dein#add('aiya000/aref-web.vim', {
+        \ 'on_cmd': ['Aref', 'ArefOpenBrowser'],
+        \ 'on_map': [['n', '<Plug>(aref_web_show_']]
         \})
   call dein#add('ebc-2in2crc/vim-ref-jvmis', {
         \ 'depends': 'vim-ref',
@@ -2617,6 +2662,8 @@ if (!s:is_cui || &t_Co >= 16) && dein#tap('lightline.vim')
   set laststatus=2
   let g:lightline = {
         \ 'colorscheme': 'wombat',
+        \ 'separator': { 'left': "\u2b80", 'right': "\u2b82" },
+        \ 'subseparator': {  'left': "\u2b81", 'right': "\u2b83" },
         \ 'mode_map': {'c': 'NORMAL'},
         \ 'active': {
         \   'left': [['mode', 'eskk_status', 'paste'], ['fugitive', 'filename']],
@@ -2677,7 +2724,7 @@ if (!s:is_cui || &t_Co >= 16) && dein#tap('lightline.vim')
     return winwidth(0) > 60 && lightline#mode() ==# 'INSERT' && exists('*eskk#statusline') ? eskk#statusline() ==# '[eskk:あ]' ? '[あ]' : '[--]' : '[--]'
   endfunction
 else
-  set statusline=%<%f\ %m\ %r%h%w%{'[fenc='.(&fenc!=#''?&fenc:&enc).']\ [ff='.&ff.']\ [ft='.(&ft==#''?'null':&ft).']\ [ascii=0x'}%B]%=\ (%v,%l)/%L%8P
+  setglobal statusline=%<%f\ %m\ %r%h%w%{'[fenc='.(&fenc!=#''?&fenc:&enc).']\ [ff='.&ff.']\ [ft='.(&ft==#''?'null':&ft).']\ [ascii=0x'}%B]%=\ (%v,%l)/%L%8P
   if has('syntax')
     augroup MyAutoCmd
       au InsertEnter * call s:hi_statusline(1)
@@ -2698,6 +2745,14 @@ else
   function! s:get_highlight(hi) abort
     return substitute(substitute(s:redir('highlight ' . a:hi), 'xxx', '', ''), '[\r\n]', '', 'g')
   endfunction
+endif
+
+if dein#tap('denite.nvim')
+  if has('win32') || has('nvim')
+    let g:python3_host_prog = 'C:\Program Files\Python35\python.exe'
+  elseif has('win32unix')
+    let g:python3_host_prog = '/c/Program Files/Python35/python.exe'
+  endif
 endif
 
 if dein#tap('unite.vim')
@@ -2801,6 +2856,72 @@ if dein#tap('vimshell')
   "   autocmd MyAutoCmd VimEnter * VimShell
   " endif
   call dein#set_hook(g:dein#name, 'hook_source', function('s:vimshell_on_source'))
+endif
+
+if dein#tap('omnisharp-vim')
+  let g:OmniSharp_selector_ui = 'ctrlp'
+  let g:OmniSharp_host = "http://localhost:2000"
+  let g:OmniSharp_timeout = 1
+  augroup omnisharp_commands
+    autocmd!
+    "Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
+    autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+
+    " Synchronous build (blocks Vim)
+    "autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
+    " Builds can also run asynchronously with vim-dispatch installed
+    autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
+    " automatic syntax check on events (TextChanged requires Vim 7.4)
+    " autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+
+    " Automatically add new cs files to the nearest project on save
+    autocmd BufWritePost *.cs call OmniSharp#AddToProject()
+
+    "show type information automatically when the cursor stops moving
+    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+
+    "The following commands are contextual, based on the current cursor position.
+
+    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+    autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
+    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
+    autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
+    "finds members in the current buffer
+    autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
+    " cursor can be anywhere on the line containing an issue
+    autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
+    autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
+    autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+    autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
+    "navigate up by method/property/field
+    autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
+    "navigate down by method/property/field
+    autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
+  augroup END
+  " Contextual code actions (requires CtrlP or unite.vim)
+  nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
+  " Run code actions with text selected in visual mode to extract method
+  vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+
+  " rename with dialog
+  nnoremap <leader>nm :OmniSharpRename<cr>
+  nnoremap <F2> :OmniSharpRename<cr>
+  " rename without dialog - with cursor on the symbol to rename... ':Rename newname'
+  command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
+
+  " Force OmniSharp to reload the solution. Useful when switching branches etc.
+  nnoremap <leader>rl :OmniSharpReloadSolution<cr>
+  nnoremap <leader>cf :OmniSharpCodeFormat<cr>
+  " Load the current .cs file to the nearest project
+  nnoremap <leader>tp :OmniSharpAddToProject<cr>
+
+  " (Experimental - uses vim-dispatch or vimproc plugin) - Start the omnisharp server for the current solution
+  nnoremap <leader>ss :OmniSharpStartServer<cr>
+  nnoremap <leader>sp :OmniSharpStopServer<cr>
+
+" Add syntax highlighting for types and interfaces
+nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 endif
 
 if dein#tap('Conque-Shell')
@@ -3429,7 +3550,7 @@ if dein#tap('vim-mplayer')
   if g:is_windows
     let mplayer#mplayer = 'C:/CommonUtil/mplayer/mplayer.exe'
   else
-    let mplayer#mplayer = '/cygdrive/c/CommonUtil/mplayer/mplayer.exe'
+    let mplayer#mplayer = '/c/CommonUtil/mplayer/mplayer.exe'
     let mplayer#use_win_mplayer_in_cygwin = 1
   endif
   let g:mplayer#suffixes = ['mp3', 'wav', 'ogg', 'flv', 'wmv', 'mp4']
