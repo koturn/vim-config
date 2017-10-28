@@ -1371,7 +1371,7 @@ call s:set_listchars()
 delfunction s:set_listchars
 
 function! s:matchadd(group, pattern, ...) abort
-  if index(map(getmatches(), 'v:val.group'), a:group) != -1 || expand('%:h:t') ==# 'doc'
+  if index(map(getmatches(), 'v:val.group'), a:group) != -1 || expand('%:h:t') ==# 'doc' || &filetype ==# 'help'
     return
   endif
   call call('matchadd', extend([a:group, a:pattern], a:000))
@@ -1405,7 +1405,7 @@ augroup MyAutoCmd
   au VimEnter,WinEnter,BufRead * call s:matchadd('JPSpace', '　')  " \%u3000
   " au VimEnter,WinEnter,BufRead * match JPSpace /　/
 
-  " au Filetype {help,vimshell,presen,showtime} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab'])
+  au Filetype {help,vimshell,presen,rogue,showtime} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab'])
 augroup END
 " }}}
 
@@ -3233,6 +3233,30 @@ if dein#tap('vim-cpp-enhanced-highlight')
 endif
 
 if dein#tap('vim-clang-format')
+  let g:clang_format#style_options = {
+        \ 'BasedOnStyle': 'Google',
+        \ 'AccessModifierOffset': -2,
+        \ 'AlignEscapedNewlinesLeft': 'false',
+        \ 'AlignTrailingComments': 'false',
+        \ 'AlwaysBreakAfterDefinitionReturnType': 'All',
+        \ 'AlwaysBreakAfterReturnType': 'All',
+        \ 'BraceWrapping': {
+        \   'AfterClass': 'true',
+        \   'AfterEnum': 'true',
+        \   'AfterFunction': 'true',
+        \   'AfterNamespace': 'true',
+        \   'AfterStruct': 'true',
+        \   'AfterUnion': 'true'
+        \ },
+        \ 'BreakBeforeBraces': 'Custom',
+        \ 'BreakConstructorInitializersBeforeComma': 'true',
+        \ 'ColumnLimit': 0,
+        \ 'ConstructorInitializerAllOnOneLineOrOnePerLine': 'false',
+        \ 'ConstructorInitializerIndentWidth': 2,
+        \ 'ContinuationIndentWidth': 2,
+        \ 'IndentWidth': 2,
+        \ 'TabWidth': 4
+        \}
   map ,x  <Plug>(operator-clang-format)
 endif
 
