@@ -417,18 +417,21 @@ if g:is_windows
 endif
 
 
-let s:t_codes = {
-      \ 'ti': &t_ti,
-      \ 'SI': &t_SI,
-      \ 'EI': &t_EI,
-      \ 'te': &t_te
-      \}
 function! s:set_term_mintty() abort
-  let &t_ti = s:t_codes.ti . "\e[2 q"
-  let &t_SI = s:t_codes.SI . "\e[6 q"
-  let &t_EI = s:t_codes.EI . "\e[2 q"
-  let &t_te = s:t_codes.te . "\e[0 q"
+  let &t_ti .= "\e[2 q"
+  let &t_SI .= "\e[6 q"
+  let &t_EI .= "\e[2 q"
+  let &t_te .= "\e[0 q"
 endfunction
+
+let s:termemu_dict = {
+      \ 'mintty': function('s:set_term_mintty')
+      \}
+
+if has_key(s:termemu_dict, $TERMEMU)
+  call s:termemu_dict[$TERMEMU]()
+endif
+
 
 if g:is_cygwin
   set enc =utf-8
@@ -438,9 +441,6 @@ if g:is_cygwin
     set t_Co=256  " Extend cygwin terminal color
   endif
   if &term !=# 'cygwin'  " not in command prompt
-    " Change cursor shape depending on mode.
-    call s:set_term_mintty()
-
     " 縦分割スクロール高速化
     " http://www.youtube.com/watch?v=KQfOArRJkYI
     " http://ttssh2.sourceforge.jp/manual/ja/usage/tips/vim.html
@@ -2132,11 +2132,11 @@ if dein#load_state(s:deindir)
         \})
 
   call dein#add('cohama/lexima.vim', {
-        \ 'on_event': 'InsertEnter'
+        \ 'lazy': 0
         \})
-  call dein#add('rhysd/endwize.vim', {
-        \ 'on_ft': ['lua', 'ruby', 'sh', 'zsh', 'vb', 'vbnet', 'aspvbs', 'vim']
-        \})
+  " call dein#add('rhysd/endwize.vim', {
+  "       \ 'on_ft': ['lua', 'ruby', 'sh', 'zsh', 'vb', 'vbnet', 'aspvbs', 'vim']
+  "       \})
   call dein#add('ctrlpvim/ctrlp.vim', {
         \ 'on_cmd': [
         \   'CtrlP',
@@ -2751,7 +2751,7 @@ if dein#tap('denite.nvim')
   if has('win32') || has('nvim')
     let g:python3_host_prog = 'C:\Program Files\Python35\python.exe'
   elseif has('win32unix')
-    let g:python3_host_prog = '/c/Program Files/Python35/python.exe'
+    " let g:python3_host_prog = '/c/Program Files/Python35/python.exe'
   endif
 endif
 
@@ -3129,14 +3129,31 @@ if dein#tap('vim-ref')
   call dein#set_hook(g:dein#name, 'hook_source', function('s:ref_on_source'))
 endif
 
-if dein#tap('endwize.vim')
-  let g:endwize_add_info_filetypes = ['ruby', 'c', 'cpp']
-  let g:endwise_no_mappings = 1
-  " autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim  imap <buffer> <silent><CR>  <CR><Plug>DiscretionaryEnd
-  autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim
-        \ imap <buffer> <silent><expr><CR>
-        \ pumvisible() ? neocomplete#smart_close_popup() . '<CR>' : '<CR><Plug>DiscretionaryEnd'
+if dein#tap('lexima.vim')
+  call lexima#add_rule({'char': '{', 'input_after': '};', 'at': '\%(class\|struct\|union\|enum\)\%([ \t\n]\+\w\+\)\?[ \t\n]\+\%#', 'filetype': 'cpp'})
+  call lexima#add_rule({'char': '<CR>', 'input_after': '<CR>#endif', 'at': '\#\s*ifn\?def\(\s\+\w\+\)\?\s*\%#', 'filetype': ['c', 'cpp']})
+  call lexima#add_rule({'char': '<CR>', 'input_after': '<CR>#endif', 'at': '\#\s*if\(\s\+[0-9a-zA-Z_()|&]\+\)\?\s*\%#', 'filetype': ['c', 'cpp']})
 endif
+
+" if dein#tap('endwize.vim')
+  " let g:endwize_add_info_filetypes = ['ruby', 'c', 'cpp']
+  " let g:endwise_no_mappings = 1
+  " if dein#tap('deoplete.nvim')
+  "   autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim
+  "         \ imap <buffer> <silent><expr><CR>
+  "         \ pumvisible() ? deoplete#smart_close_popup() . '<CR>' : '<CR><Plug>DiscretionaryEnd'
+  " elseif dein#tap('neocomplete.vim')
+  "   autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim
+  "         \ imap <buffer> <silent><expr><CR>
+  "         \ pumvisible() ? neocomplete#smart_close_popup() . '<CR>' : '<CR><Plug>DiscretionaryEnd'
+  " elseif dein#tap('neocomplcache.vim')
+  "   autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim
+  "         \ imap <buffer> <silent><expr><CR>
+  "         \ pumvisible() ? neocomplcache#smart_close_popup() . '<CR>' : '<CR><Plug>DiscretionaryEnd'
+  " else
+  "   autocmd MyAutoCmd FileType lua,ruby,sh,zsh,vb,vbnet,aspvbs,vim  imap <buffer> <silent><CR>  <CR><Plug>DiscretionaryEnd
+  " endif
+" endif
 
 if dein#tap('caw.vim')
   nmap <Leader>c  <Plug>(caw:hatpos:toggle)
