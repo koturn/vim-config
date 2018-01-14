@@ -2381,6 +2381,7 @@ call dein#add('mopp/makecomp.vim', {
         \ 'on_ft': 'opencl'
         \})
   call dein#add('lilydjwg/colorizer')
+  call dein#add('cocopon/iceberg.vim')
   call dein#add('junegunn/goyo.vim', {
         \ 'on_cmd': 'Goyo'
         \})
@@ -2543,11 +2544,20 @@ call dein#add('mopp/makecomp.vim', {
         \ 'depends': ['unite.vim', 'ctrlp.vim', 'alti.vim', 'vim-milqi'],
         \ 'on_cmd': [
         \   'AltiMPlayer',
+        \   'AltiMPlayerMru',
         \   'CtrlPMPlayer',
+        \   'CtrlPMPlayerMru',
         \   'MilqiMPlayer',
+        \   'MilqiMPlayerMru',
         \   'FZFMPlayer',
+        \   'FZFMPlayerMru',
         \   'MPlayer',
         \   'MPlayerEnqueue',
+        \   'MPlayerMru',
+        \   'MPlayerMruEnqueue',
+        \   'MPlayerMruUpdate',
+        \   'MPlayerMruReload',
+        \   'MPlayerMruClear',
         \   'MPlayerCommand',
         \   'MPlayerStop',
         \   'MPlayerVolume',
@@ -2660,8 +2670,9 @@ endif
 " ------------------------------------------------------------------------------
 if (!s:is_cui || &t_Co >= 16) && dein#tap('lightline.vim')
   set laststatus=2
+
   let g:lightline = {
-        \ 'colorscheme': 'wombat',
+        \ 'colorscheme': 'iceberg',
         \ 'separator': { 'left': "\u2b80", 'right': "\u2b82" },
         \ 'subseparator': {  'left': "\u2b81", 'right': "\u2b83" },
         \ 'mode_map': {'c': 'NORMAL'},
@@ -3596,6 +3607,13 @@ if dein#tap('vim-mplayer')
   endif
   let g:mplayer#suffixes = ['mp3', 'wav', 'ogg', 'flv', 'wmv', 'mp4']
   let g:mplayer#default_dir = '~/Music/'
+
+  nnoremap [mplayer] <Nop>
+  nmap ,m  [mplayer]
+  nnoremap [mplayer]p  :<C-u>Unite mplayer<CR>
+  nnoremap [mplayer]m  :<C-u>Unite mplayer_mru<CR>
+  nnoremap [mplayer]s  :<C-u>MPlayerStop<CR>
+  nnoremap [mplayer]v  :<C-u>MPlayerVolumeBar<CR>
 endif
 
 if dein#tap('movewin.vim')
@@ -3663,7 +3681,7 @@ endif
 filetype plugin indent on
 set background=dark
 if !s:is_cui || &t_Co == 256
-  colorscheme hybrid
+  colorscheme iceberg
 else
   colorscheme default
 endif
