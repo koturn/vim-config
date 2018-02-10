@@ -1538,6 +1538,20 @@ nnoremap <Space>r  :<C-u>registers<CR>
 nnoremap <Leader>/  /<C-u>\<\><Left><Left>
 " Repeat last substitution, including flags, with &.
 nnoremap &  :<C-u>&&<CR>
+
+function! s:hint_cmd_output(prefix, cmd) abort " {{{
+  redir => str
+    :execute a:cmd
+  redir END
+  echo str
+  return a:prefix . nr2char(getchar())
+endfunction " }}}
+nnoremap <expr> m  <SID>hint_cmd_output('m', 'marks')
+nnoremap <expr> `  <SID>hint_cmd_output('`', 'marks')
+nnoremap <expr> '  <SID>hint_cmd_output("'", 'marks')
+nnoremap <expr> "  <SID>hint_cmd_output('"', 'registers')
+nnoremap <expr> q  <SID>hint_cmd_output('q', 'registers')
+
 au MyAutoCmd Filetype html nnoremap <buffer> <F5>  :<C-u>lcd %:h<CR>:<C-u>silent !start cmd /c call chrome %<CR>
 
 inoremap <C-c>  <C-c>u
@@ -1597,7 +1611,8 @@ let s:hint_i_ctrl_x_msg = join([
       \], "\n")
 function! s:hint_i_ctrl_x() abort " {{{
   echo s:hint_i_ctrl_x_msg
-  return get(s:compl_key_dict, getchar(), '')
+  let c = getchar()
+  return get(s:compl_key_dict, c, nr2char(c))
 endfunction " }}}
 
 inoremap <expr> <C-x>  <SID>hint_i_ctrl_x()
@@ -1836,10 +1851,9 @@ command! -bar -nargs=+ -complete=customlist,s:dein_name_complete DeinUpdate  cal
 if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
   call dein#add('Shougo/dein.vim')
-  " call dein#add('OmniSharp/omnisharp-vim', {
-  "     \ 'lazy': 0,
-  "     \ 'on_ft': 'cs'
-  "     \})
+  call dein#add('OmniSharp/omnisharp-vim', {
+      \ 'on_ft': 'cs'
+      \})
   call dein#add('y0za/vim-udon-araisan', {
         \ 'lazy': 0
         \})
@@ -1973,6 +1987,10 @@ if dein#load_state(s:deindir)
         \   'NeoComplCacheClean',
         \ ],
         \ 'on_map': [['is', '<Plug>(neocomplcache_snippets_']]
+        \})
+  call dein#add('Shougo/neoinclude.vim', {
+        \ 'on_cmd': 'NeoIncludeMakeCache',
+        \ 'on_event': 'InsertEnter'
         \})
   call dein#add('Shougo/neosnippet', {
         \ 'on_event': 'InsertEnter',
