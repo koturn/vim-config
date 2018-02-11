@@ -1115,6 +1115,77 @@ if s:executable('pdftotext')
   command! -bar -complete=file -nargs=1 Pdf  call s:pdftotext(<q-args>)
 endif
 
+if exists('*win_gotoid')
+  function! s:buf_open_existing(qmods, bname) abort " {{{
+    let bnr = bufnr(a:bname)
+    if bnr == -1
+      throw 'E94: No matching buffer for ' . a:bname
+    endif
+    let wids = win_findbuf(bnr)
+    if empty(wids)
+      execute a:qmods 'new'
+      execute 'buffer' bnr
+    else
+      call win_gotoid(wids[0])
+    endif
+  endfunction " }}}
+  command! -bar -nargs=1 -complete=buffer Buffer  call s:buf_open_existing(<q-mods>, <f-args>)
+else
+  function! s:buf_open_existing(bname) abort " {{{
+    let bnr = bufnr(a:bname)
+    if bnr == -1
+      throw 'E94: No matching buffer for ' . a:bname
+    endif
+    let tindice = map(filter(map(range(1, tabpagenr('$')), '{"tindex": v:val, "blist": tabpagebuflist(v:val)}'), 'index(v:val.blist, bnr) != -1'), 'v:val.tindex')
+    if empty(tindice)
+      new
+      execute 'buffer' bnr
+    else
+      execute 'tabnext' tindice[0]
+      execute bufwinnr(bnr) 'wincmd w'
+    endif
+  endfunction " }}}
+  command! -bar -nargs=1 -complete=buffer Buffer  call s:buf_open_existing(<f-args>)
+endif
+
+if has('terminal')
+  function! s:complete_term_bufname(arglead, cmdline, cursorpos) abort " {{{
+    let arglead = tolower(a:arglead)
+    return filter(map(term_list(), 'bufname(v:val)'), '!stridx(tolower(v:val), arglead)')
+  endfunction " }}}
+
+  function! s:term_open_existing(qmods, ...) abort " {{{
+    if a:0 == 0
+      let bnrs = term_list()
+      if empty(bnrs)
+        execute a:qmods 'terminal'
+      else
+        let wids = win_findbuf(bnrs[0])
+        if empty(wids)
+          terminal
+        else
+          call win_gotoid(wids[0])
+        endif
+      endif
+    else
+      let bnr = bufnr(a:1)
+      if bnr == -1
+        throw 'E94: No matching buffer for ' . a:1
+      elseif index(term_list(), bnr) == -1
+        throw a:1 . ' is not a terminal buffer'
+      endif
+      let wids = win_findbuf(bnr)
+      if empty(wids)
+        execute a:qmods term_getsize(bnr)[0] 'new'
+        execute 'buffer' bnr
+      else
+        call win_gotoid(wids[0])
+      endif
+    endif
+  endfunction " }}}
+  command! -bar -nargs=? -complete=customlist,s:complete_term_bufname Terminal  call s:term_open_existing(<q-mods>, <f-args>)
+endif
+
 " by ujihisa
 command! -count=1 -nargs=0 GoToTheLine  silent execute getpos('.')[1][: -len(v:count) - 1] . v:count
 nnoremap <silent> gl  :<C-u>GoToTheLine<CR>
