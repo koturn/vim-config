@@ -1115,6 +1115,31 @@ if s:executable('pdftotext')
   command! -bar -complete=file -nargs=1 Pdf  call s:pdftotext(<q-args>)
 endif
 
+function! s:create_winid2bufnr_dict() abort " {{{
+  let winid2bufnr_dict = {}
+  for bnr in filter(range(1, bufnr('$')), 'v:val')
+    for wid in win_findbuf(bnr)
+      let winid2bufnr_dict[wid] = bnr
+    endfor
+  endfor
+  return winid2bufnr_dict
+endfunction " }}}
+
+function! s:show_tab_info() abort " {{{
+  echo "====== Tab Page Info ======"
+  let current_tnr = tabpagenr()
+  let winid2bufnr_dict = s:create_winid2bufnr_dict()
+  for tnr in range(1, tabpagenr('$'))
+    let current_winnr = tabpagewinnr(tnr)
+    echo (tnr == current_tnr ? '>' : ' ') 'Tab:' tnr
+    echo '    Buffer number | Window Number | Window ID | Buffer Name'
+    for wininfo in map(map(range(1, tabpagewinnr(tnr, '$')), '{"wnr": v:val, "wid": win_getid(v:val, tnr)}'), 'extend(v:val, {"bnr": winid2bufnr_dict[v:val.wid]})')
+      echo '   ' (wininfo.wnr == current_winnr ? '*' : ' ') printf('%11d | %13d | %9d | %s', wininfo.bnr, wininfo.wnr, wininfo.wid, bufname(wininfo.bnr))
+    endfor
+  endfor
+endfunction " }}}
+command! -bar TabInfo call s:show_tab_info()
+
 if exists('*win_gotoid')
   function! s:buf_open_existing(qmods, bname) abort " {{{
     let bnr = bufnr(a:bname)
