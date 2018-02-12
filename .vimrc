@@ -1637,16 +1637,20 @@ nnoremap &  :<C-u>&&<CR>
 
 function! s:hint_cmd_output(prefix, cmd) abort " {{{
   redir => str
-    :execute a:cmd
+    execute a:cmd
   redir END
+  let more_old = &more
+  set nomore
   echo str
+  let &more = more_old
   return a:prefix . nr2char(getchar())
 endfunction " }}}
 nnoremap <expr> m  <SID>hint_cmd_output('m', 'marks')
-nnoremap <expr> `  <SID>hint_cmd_output('`', 'marks')
-nnoremap <expr> '  <SID>hint_cmd_output("'", 'marks')
+nnoremap <expr> `  <SID>hint_cmd_output('`', 'marks') . 'zz'
+nnoremap <expr> '  <SID>hint_cmd_output("'", 'marks') . 'zz'
 nnoremap <expr> "  <SID>hint_cmd_output('"', 'registers')
 nnoremap <expr> q  <SID>hint_cmd_output('q', 'registers')
+nnoremap <expr> @  <SID>hint_cmd_output('@', 'registers')
 
 au MyAutoCmd Filetype html nnoremap <buffer> <F5>  :<C-u>lcd %:h<CR>:<C-u>silent !start cmd /c call chrome %<CR>
 
@@ -1706,7 +1710,10 @@ let s:hint_i_ctrl_x_msg = join([
       \ "s: Spelling suggestions ('spell')"
       \], "\n")
 function! s:hint_i_ctrl_x() abort " {{{
+  let more_old = &more
+  set nomore
   echo s:hint_i_ctrl_x_msg
+  let &more = more_old
   let c = getchar()
   return get(s:compl_key_dict, c, nr2char(c))
 endfunction " }}}
