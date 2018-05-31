@@ -941,7 +941,7 @@ endfunction
 command! -bang -bar SpeedUp  call s:speed_up(<bang>0)
 
 
-function! s:comma_period(line1, line2) abort
+function! s:comma_period(line1, line2) abort range
   let cursor = getcurpos()
   execute 'silent keepjumps keeppatterns' a:line1 ',' a:line2 's/、/，/ge'
   execute 'silent keepjumps keeppatterns' a:line1 ',' a:line2 's/。/．/ge'
@@ -1984,7 +1984,7 @@ if dein#load_state(s:deindir)
         \ 'on_func': 'vimproc'
         \})
   unlet s:cflags
-  call dein#add('editorconfig/editorconfig-vim', {
+  call dein#add('sgur/editorconfig-vim', {
         \ 'lazy': 0
         \})
   call dein#add('Yggdroot/indentLine')
