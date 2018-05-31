@@ -2976,12 +2976,13 @@ if dein#tap('neocomplcache')
 endif
 
 if dein#tap('neosnippet')
-  imap <C-k>  <Plug>(neosnippet_expand_or_jump)
-  smap <C-k>  <Plug>(neosnippet_expand_or_jump)
+  imap <C-k>  <Plug>(neosnippet_jump_or_expand)
+  smap <C-k>  <Plug>(neosnippet_jump_or_expand)
   imap <expr><TAB>  neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?
-        \ "\<Plug>(neosnippet_expand_or_jump)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+        \ "\<Plug>(neosnippet_jump_or_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
   smap <expr><TAB>  neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?
-        \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+        \ "\<Plug>(neosnippet_jump_or_expand)" : "\<TAB>"
+
   let g:neosnippet#snippets_directory = '~/github/koturn-snippets/neosnippets'
   let g:neosnippet#expand_word_boundary = 1
   if has('conceal')
