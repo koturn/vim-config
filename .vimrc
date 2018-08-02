@@ -244,9 +244,12 @@ set browsedir=buffer
 set showmatch
 set smartcase
 set whichwrap=b,s,h,l,<,>,[,]
-set visualbell t_vb=
-set belloff=all
-" set lazyredraw
+if v:version > 704 || v:version == 704 && has('patch793')
+  set visualbell t_vb=
+else
+  set belloff=all
+endif
+set lazyredraw
 set viminfo= noswapfile nobackup nowritebackup
 if has('persistent_undo')
   set noundofile
@@ -264,9 +267,10 @@ set scrolloff=5
 if s:is_cui
   set ttyfast
   set ttyscroll=3
-  set notimeout
+  set timeout
   set ttimeout
-  set timeoutlen=100
+  set timeoutlen=300
+  set ttimeoutlen=300
 else
   set timeout
   set timeoutlen=500
@@ -472,7 +476,10 @@ autocmd MyAutoCmd BufReadPost *
       \   if &modifiable && !search('[^\x00-\x7F]', 'cnw')
       \ |   setlocal fenc=ascii
       \ | endif
-
+autocmd MyAutoCmd BufWritePre *
+      \   if &modifiable && &bomb && !search('[^\x00-\x7F]', 'cnw')
+      \ |   setlocal fenc=ascii
+      \ | endif
 function! s:checktime() abort
   if bufname('%') !~# '^\%(\|[Command Line]\)$' && &filetype !~# '^\%(help\|qf\)$'
     checktime
@@ -1523,7 +1530,7 @@ augroup MyAutoCmd
   " )
   au Filetype make       setlocal sw=4 ts=4 sts=4
   au Filetype kuin       setlocal sw=2 ts=2 sts=2 noet
-  au Filetype python     setlocal sw=4 ts=4 sts=4      cindent cinkeys-=0#
+  au Filetype python     setlocal sw=4 ts=8 sts=4      cindent cinkeys-=0#
   au Filetype make       setlocal sw=4 ts=4 sts=4 noet
   au Filetype markdown   setlocal sw=4 ts=4 sts=4
   au Filetype tex        setlocal sw=2 ts=2 sts=2 conceallevel=0
@@ -1984,7 +1991,7 @@ if dein#load_state(s:deindir)
         \ 'on_func': 'vimproc'
         \})
   unlet s:cflags
-  call dein#add('sgur/editorconfig-vim', {
+  call dein#add('sgur/vim-editorconfig', {
         \ 'lazy': 0
         \})
   call dein#add('Yggdroot/indentLine')
@@ -2451,7 +2458,7 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('mattn/emoji-vim', {
         \ 'on_cmd': 'Emoji'
         \})
-  call dein#add('kannokanno/previm', {
+  call dein#add('previm/previm', {
         \ 'on_cmd': 'PrevimOpen'
         \})
   call dein#add('dhruvasagar/vim-table-mode', {
@@ -2742,7 +2749,7 @@ call dein#add('mopp/makecomp.vim', {
         \ ],
         \ 'on_source': ['unite.vim', 'denite.nvim'],
         \})
-  call dein#add('koturn/movewin.vim', {
+  call dein#add('koturn/vim-movewin', {
         \ 'on_cmd': ['MoveWin', 'MoveWinLeft', 'MoveWinDown', 'MoveWinUp', 'MoveWinRight'],
         \ 'on_map': [['nvoic', '<Plug>(movewin-']]
         \})
@@ -3670,7 +3677,7 @@ if dein#tap('vim-kotemplate')
     endfunction
     function! s:move_cursor(tag) abort
       if search(a:tag)
-        normal! "_da>
+        execute ('normal! zO"_' . len(a:tag) . 'x')
       endif
       return ''
     endfunction
@@ -3701,8 +3708,8 @@ if dein#tap('vim-kotemplate')
           \}
     let g:kotemplate#enable_autocmd = 1
     let g:kotemplate#auto_filetypes = keys(g:kotemplate#filter.pattern)
-    let g:kotemplate#autocmd_function = 'unite'
     " let g:kotemplate#autocmd_function = 'unite'
+    let g:kotemplate#autocmd_function = 'ctrlp'
     let g:kotemplate#dir = '~/github/kotemplate/'
     let g:kotemplate#tag_actions = [{
           \ '<+AUTHOR+>': 'koturn',
