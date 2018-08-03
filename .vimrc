@@ -295,14 +295,35 @@ set maxfuncdepth=10000
 "   let &keywordprg = g:private.browser_cmd
 " endif
 if s:executable('man')
-  autocmd MyAutoCmd FileType c  setlocal keywordprg=man
+  function! s:keywordprg_man(word) abort " {{{
+    let [lines, bname] = [systemlist('man ' . a:word), '[man ' . a:word . ']']
+    if v:shell_error != 0
+      echohl ErrorMsg
+      for line in lines
+        echomsg line
+      endfor
+      echohl None
+    elseif bufexists(bname)
+      call s:buf_open_existing(bname)
+    else
+      execute 'topleft new' escape(bname, '[]')
+      setfiletype man
+      call setline(1, lines)
+      call s:clear_undo()
+      setlocal bufhidden=wipe buftype=nofile nobuflisted readonly
+    endif
+  endif
+  endfunction " }}}
+  autocmd MyAutoCmd FileType c,sh,zsh  nnoremap <silent> <buffer> K  :<C-u>call <SID>keywordprg_man(expand('<cword>'))<CR>
 endif
+
 autocmd MyAutoCmd FileType help,vim  setlocal keywordprg=:help
 if s:executable('firefox')
   setglobal keywordprg=firefox\ -search
 else
   setglobal keywordprg=:help
 endif
+
 set spelllang=en,cjk
 set completeopt=menu,preview
 set showfulltag
@@ -347,7 +368,7 @@ endif
 
 if s:is_tmux
   set t_ut=
-elseif exists('&termguicolors')
+elseif exists('&termguicolors') && $COLORTERM == 'truecolor'
   set termguicolors
 endif
 
@@ -1038,7 +1059,7 @@ command! -bar ClearUndo  call s:clear_undo()
 function! s:make_viml_foldings(line1, line2) abort
   let cursor = getcurpos()
   execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*endfunction\zs\s*/ " }}}/ce'
-  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*function!\?\s\+[a-zA-Z:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)\+\zs\s*/ " {{{/ce'
+  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*function!\?\s\+[a-zA-Z\.:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)\+\zs\s*/ " {{{/ce'
   call setpos('.', cursor)
 endfunction
 command! -bar -range=% MakeVimLFoldings  call s:make_viml_foldings(<line1>, <line2>)
@@ -1148,20 +1169,21 @@ endfunction " }}}
 command! -bar TabInfo call s:show_tab_info()
 
 if exists('*win_gotoid')
-  function! s:buf_open_existing(qmods, bname) abort " {{{
+  function! s:buf_open_existing(bname, ...) abort " {{{
     let bnr = bufnr(a:bname)
     if bnr == -1
       throw 'E94: No matching buffer for ' . a:bname
     endif
     let wids = win_findbuf(bnr)
+    let qmods = a:0 > 0 ? a:1 : ''
     if empty(wids)
-      execute a:qmods 'new'
+      execute qmods 'new'
       execute 'buffer' bnr
     else
       call win_gotoid(wids[0])
     endif
   endfunction " }}}
-  command! -bar -nargs=1 -complete=buffer Buffer  call s:buf_open_existing(<q-mods>, <f-args>)
+  command! -bar -nargs=1 -complete=buffer Buffer  call s:buf_open_existing(<f-args>, <q-mods>)
 else
   function! s:buf_open_existing(bname) abort " {{{
     let bnr = bufnr(a:bname)
@@ -1244,6 +1266,7 @@ command! -bar FUtf16be    setlocal fenc=ucs-2
 
 command! -bar -nargs=1 -complete=file Rename  file <args> | call delete(expand('#'))
 command! -bar CloneToNewTab  execute 'tabnew' expand('%:p')
+command! -bar TabNew  tabnew | setlocal nobuflisted bufhidden=unload buftype=nofile
 command! -bar -nargs=1 -complete=file E  tabedit <args>
 command! -bar Q  tabclose <args>
 command! -bar GC  call garbagecollect()
