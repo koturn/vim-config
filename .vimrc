@@ -418,17 +418,17 @@ endif
 if has('clpum')
   set wildmenu wildmode=longest,popup
   set clpumheight=40
-  let &clcompletefunc = s:sid_prefix . 's:clpum_complete'
   autocmd MyAutoCmd ColorScheme * highlight! link ClPmenu Pmenu
-  function! s:clpum_complete(findstart, base) abort
-    return a:findstart ? getcmdpos() : [
-          \ {'word': 'Jan', 'menu': 'January'},
-          \ {'word': 'Feb', 'menu': 'February'},
-          \ {'word': 'Mar', 'menu': 'March'},
-          \ {'word': 'Apr', 'menu': 'April'},
-          \ {'word': 'May', 'menu': 'May'},
-          \]
-  endfunction
+  " function! s:clpum_complete(findstart, base) abort
+  "   return a:findstart ? getcmdpos() : [
+  "         \ {'word': 'Jan', 'menu': 'January'},
+  "         \ {'word': 'Feb', 'menu': 'February'},
+  "         \ {'word': 'Mar', 'menu': 'March'},
+  "         \ {'word': 'Apr', 'menu': 'April'},
+  "         \ {'word': 'May', 'menu': 'May'},
+  "         \]
+  " endfunction
+  " let &clcompletefunc = s:sid_prefix . 's:clpum_complete'
 endif
 " }}}
 " }}}
@@ -527,25 +527,27 @@ autocmd MyAutoCmd Filetype *  call s:add_dictionary()
 " ------------------------------------------------------------------------------
 " Commands and autocmds {{{
 " ------------------------------------------------------------------------------
-function! s:system(cmd) abort
-  try
-    return vimproc#cmd#system(a:cmd)
-  catch /^Vim(call)\=:E117: .\+: vimproc#cmd#system$/
-    return system(a:cmd)
-  endtry
-endfunction
-
-function! s:_system(cmd) abort
-  let out = ''
-  let job = job_start([&shell, &shellcmdflag, a:cmd], {
-        \ 'out_cb': {ch, msg -> [execute("let out .= msg"), out]},
-        \ 'out_mode': 'raw'
-        \})
-  while job_status(job) ==# 'run'
-    sleep 1m
-  endwhile
-  return out
-endfunction
+if has('job') && !s:is_nvim
+  function! s:system(arg) abort
+    let [id, out] = [job_start(a:arg, {'mode': 'raw'}), '']
+    while job_status(id) ==# 'run'
+      let out .= ch_readraw(id)
+      sleep 1m
+    endwhile
+    return out
+  endfunction
+else
+  function! s:_system(cmd) abort
+    try
+      let s:system = function('vimproc#cmd#system')
+      return s:system(a:cmd)
+    catch /^Vim(call)\=:E117: .\+: vimproc#cmd#system$/
+      let s:system = function('system')
+      return system(a:cmd)
+    endtry
+  endfunction
+  let s:system = function('s:_system')
+endif
 
 function! s:redir(cmd) abort
   let [verbose, verbosefile] = [&verbose, &verbosefile]
@@ -823,9 +825,9 @@ elseif s:executable('icacls')
 endif
 
 function! s:get_selected_text() abort
-  let tmp = @@
-  silent normal! gvy
-  let [text, @@] = [@@, tmp]
+  let tmp = @z
+  silent normal! gv"zy
+  let [text, @z] = [@z, tmp]
   return text
 endfunction
 
@@ -3700,7 +3702,7 @@ if dein#tap('vim-kotemplate')
     endfunction
     function! s:move_cursor(tag) abort
       if search(a:tag)
-        execute ('normal! zO"_' . len(a:tag) . 'x')
+        execute ('silent! normal! zO"_' . len(a:tag) . 'x')
       endif
       return ''
     endfunction
@@ -3870,6 +3872,12 @@ endif
 filetype plugin indent on
 set background=dark
 if !s:is_cui || &t_Co == 256
+  function! s:customize_iceberg() abort
+    hi! Function ctermfg=216 guifg=#e2a478
+    hi! String ctermfg=109 guifg=#89b8c2
+    hi! Type ctermfg=109 gui=NONE guifg=#89b8c2
+  endfunction
+  autocmd MyAutoCmd ColorScheme iceberg call s:customize_iceberg()
   colorscheme iceberg
 else
   colorscheme default
