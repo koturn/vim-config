@@ -529,9 +529,12 @@ autocmd MyAutoCmd Filetype *  call s:add_dictionary()
 " ------------------------------------------------------------------------------
 if has('job') && !s:is_nvim
   function! s:system(arg) abort
-    let [id, out] = [job_start(a:arg, {'mode': 'raw'}), '']
-    while job_status(id) ==# 'run'
-      let out .= ch_readraw(id)
+    let out = ''
+    let job = job_start(a:cmd, {
+          \ 'out_cb': {ch, msg -> [execute('let out .= msg'), out]},
+          \ 'out_mode': 'raw'
+          \})
+    while job_status(job) ==# 'run'
       sleep 1m
     endwhile
     return out
