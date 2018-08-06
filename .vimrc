@@ -37,7 +37,7 @@ let s:is_tmux    = $TMUX !=# ''
 
 function! s:get_sid_prefix() abort
   return matchstr(expand('<sfile>'), '^function \zs<SNR>\d\+_\zeget_sid_prefix$')
-endfun
+endfunction
 let s:sid_prefix = s:get_sid_prefix()
 delfunction s:get_sid_prefix
 
@@ -528,7 +528,7 @@ autocmd MyAutoCmd Filetype *  call s:add_dictionary()
 " Commands and autocmds {{{
 " ------------------------------------------------------------------------------
 if has('job') && !s:is_nvim
-  function! s:system(arg) abort
+  function! s:system(cmd) abort
     let out = ''
     let job = job_start(a:cmd, {
           \ 'out_cb': {ch, msg -> [execute('let out .= msg'), out]},
@@ -563,6 +563,9 @@ function! s:redir(cmd) abort
 endfunction
 
 function! s:retab_head(has_bang, width, line1, line2) abort
+  if &l:tabstop != a:width
+    let &l:tabstop = a:width
+  endif
   let spaces = repeat(' ', a:width)
   let cursor = getcurpos()
   if &expandtab
@@ -576,7 +579,7 @@ function! s:retab_head(has_bang, width, line1, line2) abort
   endif
   call setpos('.', cursor)
 endfunction
-command! -bar -bang -range=% RetabHead  call s:retab_head(<bang>0, &tabstop, <line1>, <line2>)
+command! -bar -bang -range=% -nargs=?  RetabHead  call s:retab_head(<bang>0, add([<f-args>], &tabstop)[0], <line1>, <line2>)
 
 function! s:toggle_tab_space(has_bang, width, line1, line2) abort
   let [&l:shiftwidth, &l:tabstop, &l:softtabstop] = [a:width, a:width, a:width]
@@ -828,9 +831,9 @@ elseif s:executable('icacls')
 endif
 
 function! s:get_selected_text() abort
-  let tmp = @z
+  let tmp = @@
   silent normal! gv"zy
-  let [text, @z] = [@z, tmp]
+  let [text, @@] = [@@, tmp]
   return text
 endfunction
 
@@ -1060,19 +1063,18 @@ function! s:clear_undo() abort
 endfunction
 command! -bar ClearUndo  call s:clear_undo()
 
-" {{{ Dummy folding
 function! s:make_viml_foldings(line1, line2) abort
   let cursor = getcurpos()
-  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*endfunction\zs\s*/ " }}}/ce'
-  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*function!\?\s\+[a-zA-Z\.:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)\+\zs\s*/ " {{{/ce'
+  " {{{ {{{
+  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*\%(endfunction\|endfunctio\|endfuncti\|endfunct\|endfunc\|endfun\|endfu\|endf\)\%([a-z]\)\@!\zs\%(\s*".*}}}\)\@!/ " }}}/ce'
+  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*\%(function\|functio\|functi\|funct\|func\|fun\|fu\)\%([a-z]\)\@!!\?\s\+[a-zA-Z\.:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)*\zs\%(\%(\s\+\%(abort\|dict\|range\)\)*\s*".*{{{\)\@!/ " {{{/ce'
+  " }}} }}}
   call setpos('.', cursor)
 endfunction
 command! -bar -range=% MakeVimLFoldings  call s:make_viml_foldings(<line1>, <line2>)
-" }}}
-
 
 " Save as a super user.
-if s:executable('sudo')
+if s:executable('sudo') && s:executable('tee')
   function! s:save_as_root(bang, filename) abort
     execute 'write' a:bang '!sudo tee > /dev/null' (a:filename ==# '' ? '%' : a:filename)
   endfunction
@@ -1250,7 +1252,7 @@ command! -count=1 -nargs=0 GoToTheLine  silent execute getpos('.')[1][: -len(v:c
 nnoremap <silent> gl  :<C-u>GoToTheLine<CR>
 
 " Show highlight group name under a cursor
-command! -bar VimShowHlGroup  echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+command! -bar ShowHlGroup  echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
 command! -bar Rot13  normal! mzggg?G`z
 command! -bar RandomString  echo sha256(reltimestr(reltime()))[: 7]
 command! -nargs=1 GrepCurrent  vimgrep <args> % | cwindow
@@ -1684,7 +1686,11 @@ nnoremap <expr> m  <SID>hint_cmd_output('m', 'marks')
 nnoremap <expr> `  <SID>hint_cmd_output('`', 'marks') . 'zz'
 nnoremap <expr> '  <SID>hint_cmd_output("'", 'marks') . 'zz'
 nnoremap <expr> "  <SID>hint_cmd_output('"', 'registers')
-nnoremap <expr> q  <SID>hint_cmd_output('q', 'registers')
+if exists('*reg_recording')
+  nnoremap <expr> q  reg_recording() ==# '' ? <SID>hint_cmd_output('q', 'registers') : 'q'
+else
+  nnoremap <expr> q  <SID>hint_cmd_output('q', 'registers')
+endif
 nnoremap <expr> @  <SID>hint_cmd_output('@', 'registers')
 
 au MyAutoCmd Filetype html nnoremap <buffer> <F5>  :<C-u>lcd %:h<CR>:<C-u>silent !start cmd /c call chrome %<CR>
@@ -1940,7 +1946,7 @@ let g:loaded_getscriptPlugin = 1
 " ------------------------------------------------------------------------------
 " Plugin lists and dein-configuration {{{
 " ------------------------------------------------------------------------------
-let s:deindir = expand('~/.cache/dein')
+let s:deindir = expand(g:is_cygwin ? '~/.cache/dein_win32unix' : '~/.cache/dein')
 let s:deinlocal = s:deindir . '/repos/github.com/Shougo/dein.vim'
 let &rtp = s:deinlocal . ',' . &rtp
 if !isdirectory(s:deinlocal)
@@ -3195,7 +3201,10 @@ if dein#tap('ctrlp.vim')
         \ 'nicovideo',
         \ 'kotemplate'
         \]
-  nnoremap <silent> <C-p>  :<C-u>CtrlP<CR>
+  nnoremap [ctrlp] <Nop>
+  nmap <C-p>  [ctrlp]
+  nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
+  nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
 endif
 
 if dein#tap('startmenu-vim')
