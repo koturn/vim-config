@@ -2064,7 +2064,7 @@ if dein#load_state(s:deindir)
   call dein#add('tsukkee/unite-help', {'on_source': 'unite.vim'})
   call dein#add('sorah/unite-ghq', {'on_source': 'unite.vim'})
   call dein#add('Shougo/defx.nvim', {
-        \ 'depends': ['nvim-yarp', 'vim-hug-neovim-rpc'],
+        \ 'depends': s:is_nvim ? [] : ['nvim-yarp', 'vim-hug-neovim-rpc'],
         \ 'on_cmd': 'Defx',
         \ 'on_func': 'defx'
         \})
@@ -2921,7 +2921,7 @@ if (!s:is_cui || &t_Co >= 16) && dein#tap('lightline.vim')
     return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
   endfunction
   function! s:light_line_fileencoding() abort
-    return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+    return winwidth(0) > 70 ? ((strlen(&fenc) ? &fenc : &enc) . (&bomb ? ' (BOM)' : '')) : ''
   endfunction
   function! s:light_line_mode() abort
     return winwidth(0) > 60 ? lightline#mode() : ''
@@ -3289,7 +3289,7 @@ if dein#tap('eskk.vim')
       let g:eskk#marker_jisyo_touroku = '?'
     endif
     let g:eskk#dictionary = {'path' : '~/.skk-jisyo', 'sorted' : 0, 'encoding' : 'utf-8'}
-    let g:eskk#large_dictionary = {'path' : '~/.eskk/SKK-JISYO.L', 'sorted' : 1, 'encoding' : 'euc-jp'}
+    let g:eskk#large_dictionary = {'path' : '~/.eskk/SKK-JISYO.L', 'sorted' : 1, 'encoding' : 'utf-8'}
     let g:eskk#debug = 0
     " let g:eskk#rom_input_style = 'msime'
     let g:eskk#revert_henkan_style = 'okuri'
@@ -3345,7 +3345,46 @@ if dein#tap('eskk.vim')
       call a:table.add_map(' ', '　')
     endfunction
     autocmd MyAutoCmd User eskk-initialize-pre  call s:eskk_map()
+
+    if !filereadable(expand(g:eskk#large_dictionary.path))
+      let dirpath = fnamemodify(expand(g:eskk#large_dictionary.path), ':h')
+      if !isdirectory(dirpath)
+        call mkdir(iconv(dirpath, &enc, &tenc), 'p')
+      endif
+      call s:update_skk_dict()
+    endif
   endfunction
+
+  function! s:update_skk_dict() abort " {{{
+    call eskk#is_initialized()
+    let dict_url = 'http://openlab.jp/skk/dic/SKK-JISYO.L.gz'
+    let dl_client = s:executable('wget') ? 'wget'
+          \ : s:executable('curl') ? 'curl'
+          \ : ''
+    if dl_client ==# ''
+      echoerr 'Download client, wget or curl is not available'
+      return
+    endif
+    let dstpath = fnamemodify(expand(g:eskk#large_dictionary.path), ':h') . '/SKK-JISYO.L.gz'
+    if dl_client ==# 'wget'
+      echo s:system(printf('wget %s -O "%s"', dict_url, dstpath))
+    else
+      echo s:system(printf('curl -O %s -o "%s"', dict_url, dstpath))
+    endif
+    echomsg 'Downloaded SKK-JISYO.L.gz: ' . dstpath
+    if !s:executable('gzip')
+      echoerr 'command: gzip is not available'
+      return
+    endif
+    echo s:system('gzip -df ' . dstpath)
+    echomsg 'Decompressed SKK-JISYO.L.gz'
+    if tolower(g:eskk#large_dictionary.encoding) !=# 'euc-jp'
+      let fname = fnamemodify(dstpath, ':r')
+      call writefile(map(readfile(fname), 'iconv(v:val, "euc-jp", g:eskk#large_dictionary.encoding)'), fname)
+      echomsg 'Convert character code: euc-jp -> ' . g:eskk#large_dictionary.encoding
+    endif
+  endfunction " }}}
+  command! -bar UpdateSkkDict call s:update_skk_dict()
   " execute 'autocmd MyAutoCmd User dein#source#' . g:dein#name
   "       \ 'call s:eskk_on_source() | delfunction s:eskk_on_source'
   call dein#set_hook(g:dein#name, 'hook_source', function('s:eskk_on_source'))
