@@ -267,15 +267,8 @@ set scrolloff=5
 if s:is_cui
   set ttyfast
   set ttyscroll=3
-  set timeout
-  set ttimeout
-  set timeoutlen=300
-  set ttimeoutlen=300
-else
-  set timeout
-  set timeoutlen=500
-  set ttimeoutlen=100
 endif
+set timeout ttimeout timeoutlen=1000 ttimeoutlen=100
 set autoindent smartindent
 set expandtab smarttab
 set shiftwidth=2 tabstop=2 softtabstop=-1
@@ -482,9 +475,9 @@ if g:is_windows
   set makeencoding=cp932
 endif
 if has('guess_encode')
-  set fileencodings=guess,ucs-2le,ucs-2,utf-16le,utf-16
+  set fileencodings=guess,ucs-bom,utf-16le,utf-16be,default,latin1
 else
-  set fileencodings=iso-2022-jp,ucs-bom,utf-8,euc-jp,cp932,ucs-2le,ucs-2,utf-16le,utf-16
+  set fileencodings=iso-2022-jp,utf-8,euc-jp,cp932,ucs-bom,utf-16le,utf-16be,default,latin1
 endif
 set matchpairs& matchpairs+=（:）,｛:｝,「:」,『:』
 
@@ -1252,6 +1245,7 @@ command! -count=1 -nargs=0 GoToTheLine  silent execute getpos('.')[1][: -len(v:c
 nnoremap <silent> gl  :<C-u>GoToTheLine<CR>
 
 " Show highlight group name under a cursor
+command! -bar ShowRuntimePath  echo join(split(&runtimepath, ','), "\n")
 command! -bar ShowHlGroup  echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
 command! -bar Rot13  normal! mzggg?G`z
 command! -bar RandomString  echo sha256(reltimestr(reltime()))[: 7]
@@ -1462,7 +1456,7 @@ if s:executable('tasklist')
   endif
 elseif s:executable('ps')
   function! s:show_memory_usage() abort
-    echomsg split(split(system('ps u -p ' . getpid()), "\n")[1], ' \+')[5] 'KB'
+    echomsg split(split(s:system('ps u -p ' . getpid()), "\n")[1], ' \+')[5] 'KB'
   endfunction
 else
   function! s:show_memory_usage() abort
@@ -1472,9 +1466,9 @@ endif
 command! -bar -bang ShowMemoryUsage  call s:show_memory_usage()
 
 if g:is_windows && s:executable('taskkill')
-  command! -bar Suicide  call system('taskkill /pid ' . getpid())
+  command! -bar Suicide  call s:system('taskkill /pid ' . getpid())
 elseif s:executable('kill')
-  command! -bar Suicide  call system('kill -KILL '. getpid())
+  command! -bar Suicide  call s:system('kill -KILL '. getpid())
 endif
 " }}}
 
@@ -1554,7 +1548,7 @@ augroup MyAutoCmd
   au Filetype c          setlocal                      cindent cinoptions& cinoptions+=g0,l0,N-s,t0 cinkeys-=0#
   au Filetype cpp        setlocal                      cindent cinoptions& cinoptions+=g0,j1,l0,N-s,t0,ws,Ws,(0 cinkeys-=0#
   " )
-  au Filetype cs         setlocal sw=4 ts=4 sts=4 noet
+  au Filetype cs         setlocal sw=4 ts=4 sts=4 et
   au Filetype java       setlocal sw=4 ts=4 sts=4 noet cindent cinoptions& cinoptions+=j1
   au Filetype javascript setlocal sw=2 ts=2 sts=2      cindent cinoptions& cinoptions+=j1,J1,(s
   " )
@@ -1962,7 +1956,7 @@ if !isdirectory(s:deinlocal)
   endif
   function! s:dein_init() abort
     call mkdir(s:deinlocal, 'p')
-    call system('git clone https://github.com/Shougo/dein.vim.git ' . s:deinlocal)
+    call s:system('git clone https://github.com/Shougo/dein.vim.git ' . s:deinlocal)
     source $MYVIMRC
     call dein#install()
   endfunction
@@ -2032,6 +2026,7 @@ if dein#load_state(s:deindir)
   call dein#add('thinca/vim-localrc', {
         \ 'if': '!g:is_cygwin'
         \})
+  call dein#add('thinca/vim-themis')
   call dein#add('itchyny/lightline.vim')
   call dein#add('Shougo/denite.nvim', {
         \ 'on_cmd': [
@@ -2068,6 +2063,11 @@ if dein#load_state(s:deindir)
   call dein#add('osyo-manga/unite-boost-online-doc', {'on_source': 'unite.vim'})
   call dein#add('tsukkee/unite-help', {'on_source': 'unite.vim'})
   call dein#add('sorah/unite-ghq', {'on_source': 'unite.vim'})
+  call dein#add('Shougo/defx.nvim', {
+        \ 'depends': ['nvim-yarp', 'vim-hug-neovim-rpc'],
+        \ 'on_cmd': 'Defx',
+        \ 'on_func': 'defx'
+        \})
   call dein#add('Shougo/vimfiler', {
         \ 'depends' : 'unite.vim',
         \ 'lazy': 1,
@@ -2088,12 +2088,11 @@ if dein#load_state(s:deindir)
         \   'VimFilerWrite',
         \ ]
         \})
-  call dein#add('roxma/nvim-yarp', {
-        \ 'if': !has('nvim') && !has('win32') && !has('win32unix') && v:version >= 704
-        \})
-  call dein#add('roxma/vim-hug-neovim-rpc', {
-        \ 'if': !has('nvim') && !has('win32') && !has('win32unix') && v:version >= 704
-        \})
+  if !s:is_nvim
+    call dein#add('roxma/nvim-yarp')
+    call dein#add('roxma/vim-hug-neovim-rpc')
+  endif
+  call dein#add('neovim/python-client')
   call dein#add('Shougo/deoplete.nvim', {
         \ 'if': has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704,
         \ 'on_event': 'InsertEnter'
@@ -2990,6 +2989,37 @@ if dein#tap('unite.vim')
   nnoremap [unite]M   :<C-u>Unite mplayer
 endif
 
+if dein#tap('defx.nvim')
+  function! s:defx_on_source() abort " {{{
+    function! s:defx_my_settings() abort " {{{
+      nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
+      nnoremap <silent><buffer><expr> c  defx#do_action('copy')
+      nnoremap <silent><buffer><expr> m  defx#do_action('move')
+      nnoremap <silent><buffer><expr> p  defx#do_action('paste')
+      nnoremap <silent><buffer><expr> l  defx#do_action('open')
+      nnoremap <silent><buffer><expr> E  defx#do_action('open', 'vsplit')
+      nnoremap <silent><buffer><expr> P  defx#do_action('open', 'pedit')
+      nnoremap <silent><buffer><expr> K  defx#do_action('new_directory')
+      nnoremap <silent><buffer><expr> N  defx#do_action('new_file')
+      nnoremap <silent><buffer><expr> d  defx#do_action('remove')
+      nnoremap <silent><buffer><expr> r  defx#do_action('rename')
+      nnoremap <silent><buffer><expr> x  defx#do_action('execute_system')
+      nnoremap <silent><buffer><expr> .  defx#do_action('toggle_ignored_files')
+      nnoremap <silent><buffer><expr> h  defx#do_action('cd', ['..'])
+      nnoremap <silent><buffer><expr> ~  defx#do_action('cd')
+      nnoremap <silent><buffer><expr> q  defx#do_action('quit')
+      nnoremap <silent><buffer><expr> <Space>  defx#do_action('toggle_select') . 'j'
+      nnoremap <silent><buffer><expr> *  defx#do_action('toggle_select_all')
+      nnoremap <silent><buffer><expr> j  line('.') == line('$') ? 'gg' : 'j'
+      nnoremap <silent><buffer><expr> k  line('.') == 1 ? 'G' : 'k'
+      nnoremap <silent><buffer><expr> <C-l>  defx#do_action('redraw')
+      nnoremap <silent><buffer><expr> <C-g>  defx#do_action('print')
+    endfunction " }}}
+    autocmd MyAutoCmd FileType defx  call s:defx_my_settings()
+  endfunction " }}}
+  call dein#set_hook(g:dein#name, 'hook_source', function('s:defx_on_source'))
+endif
+
 if dein#tap('deoplete.nvim')
   let g:deoplete#enable_at_startup = 1
 endif
@@ -3205,6 +3235,10 @@ if dein#tap('ctrlp.vim')
   nmap <C-p>  [ctrlp]
   nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
   nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
+  function! s:ctrlp_on_post_source() abort " {{{
+    nmap <C-p>  [ctrlp]
+  endfunction " }}}
+  call dein#set_hook(g:dein#name, 'hook_post_source', function('s:ctrlp_on_post_source'))
 endif
 
 if dein#tap('startmenu-vim')
