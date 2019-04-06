@@ -361,8 +361,12 @@ endif
 
 if s:is_tmux
   set t_ut=
-elseif exists('&termguicolors') && $COLORTERM == 'truecolor'
+elseif exists('&termguicolors') && ($COLORTERM == 'truecolor' || s:is_cui && g:is_windows && has('vcon'))
   set termguicolors
+endif
+
+if !s:is_cui
+  set guioptions=M
 endif
 
 " In windows, not to use cygwin-git.
@@ -1984,7 +1988,7 @@ function! s:dein_name_complete(arglead, cmdline, cursorpos) abort
   echomsg a:arglead
   return filter(keys(dein#get()), '!stridx(tolower(v:val), arglead)')
 endfunction
-command! -bar -nargs=+ -complete=customlist,s:dein_name_complete DeinUpdate  call dein#update(<f-args>)
+command! -bar -nargs=+ -complete=customlist,s:dein_name_complete DeinUpdate  call dein#update([<f-args>])
 
 if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
@@ -1994,9 +1998,6 @@ if dein#load_state(s:deindir)
       \})
   call dein#add('y0za/vim-udon-araisan', {
         \ 'lazy': 0
-        \})
-  call dein#add('koturn/nvim-denite-sample', {
-        \ 'on_source': 'denite.nvim'
         \})
   call dein#add('haya14busa/dein-command.vim', {
         \ 'on_cmd': 'Dein'
@@ -2026,7 +2027,12 @@ if dein#load_state(s:deindir)
   call dein#add('thinca/vim-localrc', {
         \ 'if': '!g:is_cygwin'
         \})
-  call dein#add('thinca/vim-themis')
+  call dein#add('thinca/vim-themis', {
+        \ 'lazy': 1
+        \})
+  call dein#add('janko-m/vim-test', {
+        \ 'lazy': 0
+        \})
   call dein#add('itchyny/lightline.vim')
   call dein#add('Shougo/denite.nvim', {
         \ 'on_cmd': [
@@ -2053,16 +2059,16 @@ if dein#load_state(s:deindir)
         \ ]
         \})
   call dein#add('Shougo/neomru.vim', {'on_source': 'unite.vim'})
-  call dein#add('ujihisa/unite-colorscheme', {'on_source': 'unite.vim'})
-  call dein#add('ujihisa/unite-font',{'on_source': 'unite.vim'})
-  call dein#add('osyo-manga/unite-highlight',{'on_source': 'unite.vim'})
-  call dein#add('tsukkee/unite-tag', {'on_source': 'unite.vim'})
-  call dein#add('tacroe/unite-mark', {'on_source': 'unite.vim'})
-  call dein#add('yomi322/unite-tweetvim', {'on_source': 'unite.vim'})
-  call dein#add('Shougo/unite-outline', {'on_source': 'unite.vim'})
-  call dein#add('osyo-manga/unite-boost-online-doc', {'on_source': 'unite.vim'})
-  call dein#add('tsukkee/unite-help', {'on_source': 'unite.vim'})
-  call dein#add('sorah/unite-ghq', {'on_source': 'unite.vim'})
+  call dein#add('ujihisa/unite-colorscheme')
+  call dein#add('ujihisa/unite-font')
+  call dein#add('osyo-manga/unite-highlight')
+  call dein#add('tsukkee/unite-tag')
+  call dein#add('tacroe/unite-mark')
+  call dein#add('yomi322/unite-tweetvim')
+  call dein#add('Shougo/unite-outline')
+  call dein#add('osyo-manga/unite-boost-online-doc')
+  call dein#add('tsukkee/unite-help')
+  call dein#add('sorah/unite-ghq')
   call dein#add('Shougo/defx.nvim', {
         \ 'depends': s:is_nvim ? [] : ['nvim-yarp', 'vim-hug-neovim-rpc'],
         \ 'on_cmd': 'Defx',
@@ -2092,6 +2098,10 @@ if dein#load_state(s:deindir)
     call dein#add('roxma/nvim-yarp')
     call dein#add('roxma/vim-hug-neovim-rpc')
   endif
+  call dein#add('fatih/vim-go', {
+        \ 'on_cmd': ['GoInstallBinaries', 'GoUpdateBinaries', 'GoPath'],
+        \ 'on_ft': 'go'
+        \})
   call dein#add('neovim/python-client')
   call dein#add('Shougo/deoplete.nvim', {
         \ 'if': has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704,
@@ -2219,9 +2229,7 @@ if dein#load_state(s:deindir)
   call dein#add('AndrewRadev/switch.vim', {
         \ 'on_cmd': 'Switch'
         \})
-  call dein#add('rhysd/tmpwin.vim', {
-        \ 'on_func': 'tmpwin'
-        \})
+  call dein#add('rhysd/tmpwin.vim')
   call dein#add('itchyny/calendar.vim', {
         \ 'on_cmd': 'Calendar',
         \ 'on_map': [['nv', '<Plug>(calendar)']]
@@ -2245,6 +2253,15 @@ if dein#load_state(s:deindir)
         \   'ReanimateUnLoad'
         \ ]
         \})
+  call dein#add('christoomey/vim-tmux-navigator', {
+        \ 'on_cmd': [
+        \   'TmuxNavigateLeft',
+        \   'TmuxNavigateDown',
+        \   'TmuxNavigateUp',
+        \   'TmuxNavigateRight',
+        \   'TmuxNavigatePrevious'
+        \ ]
+        \})
   call dein#add('kana/vim-textobj-user')
   call dein#add('kana/vim-textobj-entire', {
         \ 'depends': 'vim-textobj-user',
@@ -2266,10 +2283,7 @@ if dein#load_state(s:deindir)
         \ 'depends': 'vim-textobj-user',
         \ 'on_map': [['xo', 'ay'], ['xo', 'iy']]
         \})
-  call dein#add('kana/vim-textobj-django-template', {
-        \ 'depends': 'vim-textobj-user',
-        \ 'on_map': [['xo', 'adb'], ['xo', 'idb']]
-        \})
+  call dein#add('kana/vim-textobj-django-template')
   call dein#add('thinca/vim-textobj-between', {
         \ 'depends': 'vim-textobj-user',
         \ 'on_map': [['xo', 'af'], ['xo', 'if'], ['xo', '<Plug>(textobj-between-']]
@@ -2511,9 +2525,8 @@ call dein#add('mopp/makecomp.vim', {
   call dein#add('joker1007/vim-markdown-quote-syntax', {
         \ 'on_ft': 'markdown'
         \})
-  call dein#add('octol/vim-cpp-enhanced-highlight', {
-        \ 'on_ft': ['c', 'cpp'],
-        \})
+  call dein#add('octol/vim-cpp-enhanced-highlight')
+  call dein#add('Mizuchi/STL-Syntax')
   call dein#add('kana/vim-operator-user')
   call dein#add('rhysd/vim-clang-format', {
         \ 'depends': ['vim-operator-user'],
@@ -2544,21 +2557,11 @@ call dein#add('mopp/makecomp.vim', {
   " call dein#add('justmao945/vim-clang', {
   "       \ 'on_ft': ['c', 'cpp']
   "       \})
-  call dein#add('pangloss/vim-javascript', {
-        \ 'on_ft': 'javascript'
-        \})
-  call dein#add('heavenshell/vim-jsdoc', {
-        \ 'on_ft': 'javascript'
-        \})
-  call dein#add('othree/html5-syntax.vim', {
-        \ 'on_ft': 'html'
-        \})
-  call dein#add('hail2u/vim-css3-syntax', {
-        \ 'on_ft': 'css'
-        \})
-  call dein#add('elzr/vim-json', {
-        \ 'on_ft': 'json'
-        \})
+  call dein#add('pangloss/vim-javascript')
+  call dein#add('heavenshell/vim-jsdoc')
+  call dein#add('othree/html5-syntax.vim')
+  call dein#add('hail2u/vim-css3-syntax')
+  call dein#add('elzr/vim-json')
   " call dein#add('mitechie/pyflakes-pathogen', {
   "       \ 'on_ft': 'python'
   "       \})
@@ -2569,15 +2572,9 @@ call dein#add('mopp/makecomp.vim', {
       \ 'on_ft': ['lisp', 'scheme', 'clojure'],
       \ 'on_path': ['\.lisp$', '\.scm$', '\.clojure$'],
       \})
-  call dein#add('vim-scripts/gnuplot.vim', {
-        \ 'on_ft': 'gnuplot'
-        \})
-  call dein#add('tatt61880/kuin_vim', {
-        \ 'on_ft': 'kuin'
-        \})
-  call dein#add('brgmnn/vim-opencl', {
-        \ 'on_ft': 'opencl'
-        \})
+  call dein#add('vim-scripts/gnuplot.vim')
+  call dein#add('tatt61880/kuin_vim')
+  call dein#add('brgmnn/vim-opencl')
   call dein#add('lilydjwg/colorizer')
   call dein#add('cocopon/iceberg.vim')
   call dein#add('junegunn/goyo.vim', {
@@ -2956,6 +2953,13 @@ else
   endfunction
 endif
 
+if dein#tap('vim-test')
+  if !s:executable('themis') && dein#tap('vim-themis')
+    let $PATH .= (g:is_windows ? ';' : ':') . expand(s:deindir . '/repos/github.com/thinca/vim-themis/bin/')
+  endif
+  let g:test#runner_commands = ['Themis']
+endif
+
 if dein#tap('denite.nvim')
   if has('win32') || has('nvim')
     let g:python3_host_prog = 'C:\Program Files\Python35\python.exe'
@@ -2966,6 +2970,16 @@ endif
 
 if dein#tap('unite.vim')
   let g:unite_enable_start_insert = 1
+  if s:executable('hw')
+    let g:unite_source_grep_command = 'hw'
+    let g:unite_source_grep_default_opts = '--no-group --no-color'
+  elseif s:executable('ag')
+    let g:unite_source_grep_command = 'ag'
+    let g:unite_source_grep_default_opts = '--no-group --no-color -iS'
+  elseif s:executable('ack')
+    let g:unite_source_grep_command = 'ack'
+    let g:unite_source_grep_default_opts = '--no-group --no-color'
+  endif
   nnoremap [unite] <Nop>
   nmap ,u  [unite]
   nnoremap [unite]u  :<C-u>Unite<Space>
@@ -3221,6 +3235,17 @@ if dein#tap('vim-reanimate')
   let g:reanimate_sessionoptions = 'curdir,folds,help,localoptions,slash,tabpages,winsize'
 endif
 
+if dein#tap('vim-tmux-navigator')
+  if s:is_tmux
+    let g:tmux_navigator_no_mappings = 1
+    nnoremap <silent> <C-w>h  :<C-u>TmuxNavigateLeft<CR>
+    nnoremap <silent> <C-w>j  :<C-u>TmuxNavigateDown<CR>
+    nnoremap <silent> <C-w>k  :<C-u>TmuxNavigateUp<CR>
+    nnoremap <silent> <C-w>l  :<C-u>TmuxNavigateRight<CR>
+    nnoremap <silent> <C-w><Leader> :<C-u>TmuxNavigatePrevious<CR>
+  endif
+endif
+
 if dein#tap('ctrlp.vim')
   let g:ctrlp_path_nolim = 1
   let g:ctrlp_key_loop = 1
@@ -3231,6 +3256,10 @@ if dein#tap('ctrlp.vim')
         \ 'nicovideo',
         \ 'kotemplate'
         \]
+  " if s:executable('ag')
+  "   let g:ctrlp_use_caching = 0
+  "   let g:ctrlp_user_command = 'ag %s -iS0 --nocolor --nogroup --nobreak -g ""'
+  " endif
   nnoremap [ctrlp] <Nop>
   nmap <C-p>  [ctrlp]
   nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
@@ -3794,7 +3823,8 @@ if dein#tap('vim-kotemplate')
     let g:kotemplate#filter = {
           \ 'pattern': {
           \   'c': ['*.{c,h}'],
-          \   'cpp': ['*.{c,cc,cpp,cxx,h,hpp}'],
+          \   'cmake': ['CMakeLists.txt', '*.cmake'],
+          \   'cpp': ['*.{cc,cpp,cxx,h,hpp}'],
           \   'cs': ['*.cs'],
           \   'go': ['*.go'],
           \   'kuin': ['*.kn'],

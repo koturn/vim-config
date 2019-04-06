@@ -12,12 +12,7 @@
 " Basic settings
 " ------------------------------------------------------------
 scriptencoding utf-8
-let g:did_install_default_menus = 1
-if has('kaoriya')
-  set guioptions=
-else
-  set guioptions=
-endif
+
 set winaltkeys=no  " Turns off the Alt key bindings to the gui menu
 set cursorline cursorcolumn
 set guicursor+=a:blinkon0
@@ -92,4 +87,8 @@ if exists('+transparency')
     autocmd FocusLost * let &transparency = s:transparencies[1]
   augroup END
 endif
-set t_vb=
+if v:version > 704 || v:version == 704 && has('patch793')
+  set belloff=all
+else
+  set t_vb=
+endif
