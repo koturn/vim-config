@@ -3,14 +3,23 @@ set cpo&vim
 scriptencoding utf-8
 
 
-function! pluginconfig#quickrun() abort
+function! pluginconfig#quickrun() abort " {{{
+  let has_job = has('job') || has('nvim')
+  if !has_job
+    try
+      call vimproc#version()
+      let has_vimproc = 1
+    catch
+      let has_vimproc = 0
+    endtry
+  endif
   let g:quickrun_config = {
         \ '_': {
         \   'outputter': 'error',
         \   'outputter/error': 'quickfix',
         \   'outputter/error/success': 'buffer',
         \   'outputter/buffer/split': ':botright',
-        \   'runner': 'job',
+        \   'runner': has_job ? 'job' : has_vimproc ? 'vimproc' : 'system',
         \   'outputter/buffer/close_on_empty': 1,
         \   'hook/shebang/enable': !has('win32') && !has('win64')
         \ },
@@ -38,7 +47,6 @@ function! pluginconfig#quickrun() abort
         \   'hook/output_encode/enable': 1,
         \   'hook/output_encode/encoding': &termencoding,
         \ },
-        \
         \ 'lisp': executable('sbcl') ? {
         \   'command': 'sbcl',
         \   'exec': '%C --script %S',
@@ -56,7 +64,7 @@ function! pluginconfig#quickrun() abort
         \   'exec': '%C %S',
         \ },
         \ 'python': {
-        \   'command': 'python',
+        \   'command': has('win32') ? 'python' : 'python3',
         \   'exec': '%C %S',
         \ },
         \ 'ruby': {
@@ -75,16 +83,17 @@ function! pluginconfig#quickrun() abort
         \   'outputter': 'error:buffer:quickfix',
         \   'command': 'make',
         \   'exec': '%c %o'
+        \ },
+        \ 'nsis': {
+        \   'command': 'makensis',
+        \   'exec': '%C %S',
         \ }
         \}
   nnoremap <expr><silent><C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
   nnoremap <Leader>r  :<C-u>QuickRun -exec '%C %S'<CR>
-  " \ }, 'html': {
-  " \   'command': 'cat',
-  " \   'outputter': 'browser',
-endfunction
+endfunction " }}}
 
-function! pluginconfig#ref() abort
+function! pluginconfig#ref() abort " {{{
   " A Setting for the site of webdict.
   let g:ref_source_webdict_sites = {
         \ 'je': {'url': 'http://dictionary.infoseek.ne.jp/jeword/%s'},
@@ -103,55 +112,59 @@ function! pluginconfig#ref() abort
 
   " If you don't specify a following setting, webdict-results are garbled.
   let pauth = get(g:private, 'pauth', '')
-  let lynx = get(g:private, 'lynx', 'lynx')
-  if pauth ==# ''
-    let g:ref_source_webdict_cmd = lynx . ' -dump -nonumbers %s'
-  else
-    let g:ref_source_webdict_cmd = lynx . ' -dump -nonumbers -pauth=' . pauth . ' %s'
+  " let lynx = get(g:private, 'lynx', 'lynx')
+  " if pauth ==# ''
+  "   let g:ref_source_webdict_cmd = lynx . ' -dump -nonumbers %s'
+  " else
+  "   let g:ref_source_webdict_cmd = lynx . ' -dump -nonumbers -pauth=' . pauth . ' %s'
+  " endif
+  " unlet pauth lynx
+  if executable('w3m')
+    let g:ref_source_webdict_cmd = 'w3m -dump -O ' . &termencoding . (pauth ==# '' ? '' : (' -pauth ' . pauth)) . ' %s'
+  elseif executable('lynx')
+    let g:ref_source_webdict_cmd = 'lynx -dump -nonumbers' . (pauth ==# '' ? '' : (' -pauth=' . pauth)) . ' %s'
   endif
-  unlet pauth lynx
 
   " Default webdict site
   let g:ref_source_webdict_sites.default = 'ej'
   " Filters for output. Remove the first few lines.
-  function! g:ref_source_webdict_sites.je.filter(output)
+  function! g:ref_source_webdict_sites.je.filter(output) abort " {{{
     let idx = strridx(a:output, '   (C) SHOGAKUKAN')
     return join(split(a:output[: idx - 1], "\n")[15 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.ej.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.ej.filter(output) abort " {{{
     if v:shell_error
       echoerr 'shellerror:' v:shell_error
     endif
     let idx = strridx(a:output, '   (C) SHOGAKUKAN')
     let g:output = a:output
     return join(split(a:output[: idx - 1], "\n")[15 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.Ej.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.Ej.filter(output) abort " {{{
     let idx = strridx(a:output, '統計情報')
     return join(split(a:output[: idx - 1], "\n")[70 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.dn.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.dn.filter(output) abort " {{{
     let idx = strridx(a:output, "\n   [l_box_b]\n")
     return join(split(a:output[: idx], "\n")[16 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.wiki.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.wiki.filter(output) abort " {{{
     let idx = strridx(a:output, "\n案内メニュー\n")
     return join(split(a:output[: idx], "\n")[17 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.wiki_en.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.wiki_en.filter(output) abort " {{{
     let idx = strridx(a:output, "\nNavigation menu\n")
     return join(split(a:output[: idx], "\n")[17 :], "\n")
-  endfunction
-  function! g:ref_source_webdict_sites.alc.filter(output)
+  endfunction " }}}
+  function! g:ref_source_webdict_sites.alc.filter(output) abort " {{{
     let list = split(a:output, "\n")
     let list = list[match(list, '   英辞郎データ提供元 EDP のサイトへ') + 3 :]
     let list = list[: match(list, '   ＊ データの転載は禁じられています。') - 3]
     return join(filter(list, 'v:val !=# "       単語帳"'), "\n")
-  endfunction
-endfunction
+  endfunction " }}}
+endfunction " }}}
 
-
-function! pluginconfig#switch() abort
+function! pluginconfig#switch() abort " {{{
   let g:switch_custom_definitions = [
         \ ['yes', 'no'],
         \ ['left', 'right'],
@@ -215,7 +228,7 @@ function! pluginconfig#switch() abort
         \ [510, ':not_extended'],
         \ [511, ':network_authentication_required'],
         \]
-endfunction
+endfunction " }}}
 
 
 let &cpo = s:save_cpo

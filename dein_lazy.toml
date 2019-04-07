@@ -1,0 +1,1244 @@
+[[plugins]]
+repo = 'haya14busa/dein-command.vim'
+on_cmd = 'Dein'
+
+[[plugins]]
+repo = 'Shougo/defx.nvim'
+depends = ['nvim-yarp', 'vim-hug-neovim-rpc']
+on_cmd = 'Defx'
+on_func = 'defx'
+hook_source = '''
+function! s:defx_my_settings() abort
+  nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
+  nnoremap <silent><buffer><expr> c  defx#do_action('copy')
+  nnoremap <silent><buffer><expr> m  defx#do_action('move')
+  nnoremap <silent><buffer><expr> p  defx#do_action('paste')
+  nnoremap <silent><buffer><expr> l  defx#do_action('open')
+  nnoremap <silent><buffer><expr> E  defx#do_action('open', 'vsplit')
+  nnoremap <silent><buffer><expr> P  defx#do_action('open', 'pedit')
+  nnoremap <silent><buffer><expr> K  defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N  defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> d  defx#do_action('remove')
+  nnoremap <silent><buffer><expr> r  defx#do_action('rename')
+  nnoremap <silent><buffer><expr> x  defx#do_action('execute_system')
+  nnoremap <silent><buffer><expr> .  defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> h  defx#do_action('cd', ['..'])
+  nnoremap <silent><buffer><expr> ~  defx#do_action('cd')
+  nnoremap <silent><buffer><expr> q  defx#do_action('quit')
+  nnoremap <silent><buffer><expr> <Space>  defx#do_action('toggle_select') . 'j'
+  nnoremap <silent><buffer><expr> *  defx#do_action('toggle_select_all')
+  nnoremap <silent><buffer><expr> j  line('.') == line('$') ? 'gg' : 'j'
+  nnoremap <silent><buffer><expr> k  line('.') == 1 ? 'G' : 'k'
+  nnoremap <silent><buffer><expr> <C-l>  defx#do_action('redraw')
+  nnoremap <silent><buffer><expr> <C-g>  defx#do_action('print')
+endfunction
+autocmd MyAutoCmd FileType defx  call s:defx_my_settings()
+'''
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+depends = ['nvim-yarp', 'vim-hug-neovim-rpc']
+# if = "has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704"
+if = "has('python3') && (has('nvim') || v:version >= 704)"
+on_event = ['InsertEnter', 'FocusLost', 'CursorHold']
+hook_add = '''
+let g:deoplete#enable_at_startup = 1
+'''
+
+[[plugins]]
+repo = 'Shougo/neocomplete.vim'
+# if = "!(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))"
+if = 0
+on_cmd = ['NeoCompleteEnable', 'NeoCompleteDisable', 'NeoCompleteLock', 'NeoCompleteUnlock', 'NeoCompleteToggle', 'NeoCompleteSetFileType', 'NeoCompleteClean', 'NeoCompleteBufferMakeCache', 'NeoCompleteDictionaryMakeCache', 'NeoCompleteSyntaxMakeCache', 'NeoCompleteTagMakeCache']
+on_event = 'InsertEnter'
+hook_add = '''
+" inoremap <expr><CR>  neocomplete#smart_close_popup() . "\<CR>"
+" inoremap <expr><CR>  pumvisible() ? neocomplete#smart_close_popup() . "\<CR>" : "\<CR>"
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#sources#dictionary#dictionaries = {
+      \ 'default': '',
+      \ 'cpp': expand('~/github/VimDict/cpp.txt')
+      \}
+'''
+
+[[plugins]]
+repo = 'Shougo/neocomplcache'
+# if = "!(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && !(has('lua') && (v:version > 703 || (v:version == 703 && has('patch885'))))"
+if = 0
+on_event = 'InsertEnter'
+on_cmd' = [
+  'NeoComplCacheEnable',
+  'NeoComplCacheDisable',
+  'NeoComplCacheLock',
+  'NeoComplCacheUnlock',
+  'NeoComplCacheToggle',
+  'NeoComplCacheLockSource',
+  'NeoComplCacheUnlockSource',
+  'NeoComplCacheSetFileType',
+  'NeoComplCacheClean'
+]
+'on_map' = [['is', '<Plug>(neocomplcache_snippets_']]
+
+[[plugins]]
+repo = 'cohama/lexima.vim'
+on_event = ['InsertEnter', 'FocusLost', 'CursorHold']
+hook_source = '''
+call lexima#add_rule({'char': '{', 'input_after': '};', 'at': '\%(class\|struct\|union\|enum\)\%([ \t\n]\+\w\+\)\?[ \t\n]\+\%#', 'filetype': 'cpp'})
+call lexima#add_rule({'char': '<CR>', 'input_after': '<CR>#endif', 'at': '\#\s*ifn\?def\(\s\+\w\+\)\?\s*\%#', 'filetype': ['c', 'cpp']})
+call lexima#add_rule({'char': '<CR>', 'input_after': '<CR>#endif', 'at': '\#\s*if\(\s\+[0-9a-zA-Z_()|&]\+\)\?\s*\%#', 'filetype': ['c', 'cpp']})
+'''
+
+[[plugins]]
+repo = 'Shougo/neoinclude.vim'
+on_cmd = 'NeoIncludeMakeCache'
+
+[[plugins]]
+repo = 'Shougo/neomru.vim'
+on_source = 'unite.vim'
+
+[[plugins]]
+repo = 'Shougo/neosnippet'
+on_event = 'InsertEnter'
+on_cmd = ['NeoSnippetEdit', 'NeoSnippetMakeCache', 'NeoSnippetSource', 'NeoSnippetClearMarkers']
+on_ft = 'neosnippet'
+on_map = [['nisx', '<Plug>(neosnippet_']]
+hook_add = '''
+imap <C-k>  <Plug>(neosnippet_jump_or_expand)
+smap <C-k>  <Plug>(neosnippet_jump_or_expand)
+imap <expr><TAB>  neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?
+      \ "\<Plug>(neosnippet_jump_or_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+smap <expr><TAB>  neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?
+      \ "\<Plug>(neosnippet_jump_or_expand)" : "\<TAB>"
+
+let g:neosnippet#snippets_directory = '~/github/koturn-snippets/neosnippets'
+" let g:neosnippet#expand_word_boundary = 1
+if has('conceal')
+  " set conceallevel=2 concealcursor=i
+  set conceallevel=0 concealcursor=incv
+endif
+'''
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+on_cmd = ['Denite', 'DeniteBufferDir', 'DeniteCursorWord']
+
+[[plugins]]
+repo = 'Shougo/unite.vim'
+on_cmd = ['Unite', 'UniteWithCurrentDir', 'UniteWithBufferDir', 'UniteWithProjectDir', 'UniteWithInputDirectory', 'UniteWithCursorWord', 'UniteWithInput', 'UniteResume', 'UniteClose', 'UniteNext', 'UnitePrevious', 'UniteFirst', 'UniteLast']
+hook_add = '''
+let g:unite_enable_start_insert = 1
+if executable('hw')
+  let g:unite_source_grep_command = 'hw'
+  let g:unite_source_grep_default_opts = '--no-group --no-color'
+elseif executable('ag')
+  let g:unite_source_grep_command = 'ag'
+  let g:unite_source_grep_default_opts = '--no-group --no-color -iS'
+elseif executable('ack')
+  let g:unite_source_grep_command = 'ack'
+  let g:unite_source_grep_default_opts = '--no-group --no-color'
+endif
+nnoremap [unite] <Nop>
+nmap ,u  [unite]
+nnoremap [unite]u  :<C-u>Unite<Space>
+nnoremap <silent> [unite]a  :<C-u>Unite airline_themes -auto-preview -winheight=12<CR>
+nnoremap <silent> [unite]b  :<C-u>Unite buffer<CR>
+nnoremap <silent> [unite]c  :<C-u>Unite colorscheme -auto-preview<CR>
+nnoremap <silent> [unite]d  :<C-u>Unite directory<CR>
+nnoremap <silent> [unite]f  :<C-u>Unite buffer file_rec/async:! file file_mru<CR>
+nnoremap <silent> [unite]F  :<C-u>Unite font -auto-preview<CR>
+nnoremap <silent> [unite]h  :<C-u>Unite highlight<CR>
+nnoremap <silent> [unite]m  :<C-u>Unite mark -auto-preview<CR>
+nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
+nnoremap <silent> [unite]r  :<C-u>Unite register<CR>
+nnoremap <silent> [unite]s  :<C-u>Unite source<CR>
+nnoremap <silent> [unite]t  :<C-u>Unite tag<CR>
+nnoremap <silent> [unite]T  :<C-u>Unite tweetvim<CR>
+nnoremap <silent><expr> [unite]/ line('$') > 5000 ?
+      \ ":\<C-u>Unite -buffer-name=search -no-split -start-insert line/fast\<CR>" :
+      \ ":\<C-u>Unite -buffer-name=search -start-insert line\<CR>"
+nnoremap <Space>ub  :<C-u>UniteWithCursorWord boost-online-doc<CR>
+nnoremap [unite]M   :<C-u>Unite mplayer
+'''
+
+[[plugins]]
+repo = 'ctrlpvim/ctrlp.vim'
+on_cmd = ['CtrlP', 'CtrlPMRUFiles', 'CtrlPBuffer', 'CtrlPLastMode', 'CtrlPClearCache', 'CtrlPClearAllCaches', 'CtrlPCtrlPCache', 'CtrlPAllCtrlPCaches', 'CtrlPCurWD', 'CtrlPCurFile', 'CtrlPRoot', 'CtrlPTag', 'CtrlPQuickfix', 'CtrlPDir', 'CtrlPBufTag', 'CtrlPBufTagAll', 'CtrlPRTS', 'CtrlPUndo', 'CtrlPLine', 'CtrlPChange', 'CtrlPChangeAll', 'CtrlPMixed', 'CtrlPBookmarkDir', 'CtrlPBookmarkDirAdd']
+hook_add = '''
+let g:ctrlp_path_nolim = 1
+let g:ctrlp_key_loop = 1
+let g:ctrlp_extensions = [
+      \ 'mplayer',
+      \ 'rebuildfm',
+      \ 'mozaicfm',
+      \ 'nicovideo',
+      \ 'kotemplate'
+      \]
+" if executable('ag')
+"   let g:ctrlp_use_caching = 0
+"   let g:ctrlp_user_command = 'ag %s -iS0 --nocolor --nogroup --nobreak -g ""'
+" endif
+nnoremap [ctrlp] <Nop>
+nmap <C-p>  [ctrlp]
+nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
+nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
+'''
+hook_post_source = '''
+nmap <C-p>  [ctrlp]
+'''
+
+[[plugins]]
+repo = 'LeafCage/alti.vim'
+on_func = 'alti'
+
+[[plugins]]
+repo = 'Shougo/vimfiler'
+depends = 'unite.vim'
+on_cmd = ['VimFiler', 'VimFilerDouble', 'VimFilerCurrentDir', 'VimFilerBufferDir', 'VimFilerCreate', 'VimFilerSimple', 'VimFilerSplit', 'VimFilerTab', 'VimFilerExplorer', 'VimFilerClose', 'VimFilerEdit', 'VimFilerRead', 'VimFilerSource', 'VimFilerWrite']
+
+[[plugins]]
+repo = 'Shougo/vimproc.vim'
+build = "make CFLAGS='' -Ofast -march=native -flto -s -Wall -Wextra -Wno-unused -Wno-unused-parameter -use=gnu99 -shared"
+on_cmd = ['VimProcInstall', 'VimProcBang', 'VimProcRead']
+on_func = 'vimproc'
+
+[[plugins]]
+repo = 'Shougo/vimshell'
+depends = 'vimproc.vim'
+on_cmd = ['VimShell', 'VimShellCreate', 'VimShellPop', 'VimShellTab', 'VimShellCurrentDir', 'VimShellBufferDir', 'VimShellExecute', 'VimShellInteractive', 'VimShellSendString', 'VimShellSendBuffer', 'VimShellClose']
+on_map = [['n', '<Plug>(vimshell_']]
+hook_source = '''
+if has('gui_running')
+  let s:my_vimshell_prompt_counter = -1
+  let s:my_vimshell_anim = [
+        \ "(´:_:`)",
+        \ "( ´:_:)",
+        \ "(  ´:_)",
+        \ "(   ´:)",
+        \ "(    ´)",
+        \ "(     )",
+        \ "(     )",
+        \ "(`    )",
+        \ "(:`   )",
+        \ "(_:`  )",
+        \ "(:_:` )",
+        \]
+  let s:my_vimshell_anim_len = len(s:my_vimshell_anim)
+  function! s:my_vimshell_dynamic_prompt() abort
+    let s:my_vimshell_prompt_counter += 1
+    return s:my_vimshell_anim[s:my_vimshell_prompt_counter % s:my_vimshell_anim_len]
+  endfunction
+  let g:vimshell_prompt_expr = s:sid_prefix . 'my_vimshell_dynamic_prompt() . " $ "'
+  let g:vimshell_prompt_pattern = '^([ ´:_:`]\{5}) \$ '
+else
+  let g:vimshell_prompt = "('v ')$ "
+endif
+let g:vimshell_secondary_prompt = '> '
+let g:vimshell_user_prompt = 'getcwd()'
+let g:vimshell_right_prompt = '"[" . strftime("%Y/%m/%d %H:%M:%S", localtime()) . "]"'
+'''
+
+[[plugins]]
+repo = 'Shougo/vinarise'
+on_cmd = ['Vinarise', 'VinarisePluginBitmapView', 'VinarisePluginDump']
+
+[[plugins]]
+repo = 'AndrewRadev/switch.vim'
+on_cmd = 'Switch'
+hook_add = 'nnoremap <silent> <Space>!  :<C-u>Switch<CR>'
+hook_source = '''
+call pluginconfig#switch()
+delfunction pluginconfig#switch
+'''
+
+[[plugins]]
+repo = 'LeafCage/vimhelpgenerator'
+on_cmd = ['VimHelpGenerator', 'VimHelpGeneratorVirtual']
+hook_add = '''
+let g:vimhelpgenerator_defaultlanguage = 'en'
+let g:vimhelpgenerator_version = ''
+let g:vimhelpgenerator_author = 'Author  : koturn'
+let g:vimhelpgenerator_contents = {
+      \ 'contents': 1, 'introduction': 1, 'usage': 1, 'interface': 1,
+      \ 'variables': 1, 'commands': 1, 'key-mappings': 1, 'functions': 1,
+      \ 'setting': 0, 'todo': 1, 'changelog': 0
+      \}
+'''
+
+[[plugins]]
+repo = 'basyura/TweetVim'
+depends = ['open-browser.vim', 'twibill.vim']
+on_cmd = ['TweetVimAccessToken', 'TweetVimAddAccount', 'TweetVimClearIcon', 'TweetVimCommandSay', 'TweetVimCurrentLineSay', 'TweetVimHomeTimeline', 'TweetVimListStatuses', 'TweetVimMentions', 'TweetVimSay', 'TweetVimSearch', 'TweetVimSwitchAccount', 'TweetVimUserStream', 'TweetVimUserTimeline', 'TweetVimVersion']
+on_source = 'unite.vim'
+hook_source = '''
+let g:tweetvim_original_hi = 1
+let g:tweetvim_tweet_per_page = 50
+let g:tweetvim_display_source = 1
+let g:tweetvim_display_time = 1
+" let g:tweetvim_display_icon = 1
+
+nnoremap [tweetvim] <Nop>
+nmap ,t  [tweetvim]
+" nnoremap [ref]t
+"       \ :<C-u>call tmpwin#toggle(['normal! gg', 'setl nohidden'], 'TweetVimHomeTimeline')<CR>
+nnoremap [tweetvim]tc  :<C-u>call tweetvim#say#current_line()<CR>
+nnoremap [tweetvim]ts  :<C-u>call tweetvim#say#open_with_account()<CR>
+nnoremap [tweetvim]th  :<C-u>call tmpwin#toggle('TweetVimHomeTimeline')<CR>
+'''
+
+[[plugins]]
+repo = 'christianrondeau/vimcastle'
+on_cmd = 'Vimcastle'
+
+[[plugins]]
+repo = 'christoomey/vim-tmux-navigator'
+on_cmd = ['TmuxNavigateLeft', 'TmuxNavigateDown', 'TmuxNavigateUp', 'TmuxNavigateRight', 'TmuxNavigatePrevious']
+if = "$TMUX !=# ''"
+hook_add = '''
+let g:tmux_navigator_no_mappings = 1
+nnoremap <silent> <C-w>h  :<C-u>TmuxNavigateLeft<CR>
+nnoremap <silent> <C-w>j  :<C-u>TmuxNavigateDown<CR>
+nnoremap <silent> <C-w>k  :<C-u>TmuxNavigateUp<CR>
+nnoremap <silent> <C-w>l  :<C-u>TmuxNavigateRight<CR>
+nnoremap <silent> <C-w><Leader> :<C-u>TmuxNavigatePrevious<CR>
+'''
+
+[[plugins]]
+repo = 'cohama/agit.vim'
+on_cmd = ['Agit', 'AgitFile']
+
+[[plugins]]
+repo = 'daisuzu/facebook.vim'
+# build = {'linux': 'pip install fbconsole', 'unix': 'pip install fbconsole', 'windows': 'pip install fbconsole', 'mac': 'pip install fbconsole', 'cygwin': 'pip install fbconsole'}
+depends = ['open-browser.vim', 'webapi-vim']
+on_cmd = ['FacebookHome', 'FacebookFeed', 'FacebookWallPost', 'FacebookAuthenticate']
+
+[[plugins]]
+repo = 'daisuzu/rainbowcyclone.vim'
+on_cmd = ['RC', 'RCReset', 'RCList', 'RCConcat']
+on_map = [['n', '<Plug>(rc_']]
+hook_add = '''
+nmap c/  <Plug>(rc_search_forward)
+nmap c?  <Plug>(rc_search_backward)
+nmap <silent> c*  <Plug>(rc_search_forward_with_cursor)
+nmap <silent> c#  <Plug>(rc_search_backward_with_cursor)
+nmap <silent> cn  <Plug>(rc_search_forward_with_last_pattern)
+nmap <silent> cN  <Plug>(rc_search_backward_with_last_pattern)
+'''
+
+[[plugins]]
+repo = 'deris/vim-duzzle'
+on_cmd = 'DuzzleStart'
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+on_cmd = ['TableModeToggle', 'TableModeEnable', 'TableModeDisable', 'Tableize', 'TableSort', 'TableAddFormula', 'TableModeRealign', 'TableEvalFormulaLine']
+on_map = '<Plug>(table-mode-'
+
+[[plugins]]
+repo = 'ebc-2in2crc/vim-ref-jvmis'
+depends = 'vim-ref'
+on_cmd = 'Jvmis'
+
+[[plugins]]
+repo = 'fatih/vim-go'
+on_cmd = ['GoInstallBinaries', 'GoUpdateBinaries', 'GoPath']
+on_ft = 'go'
+
+[[plugins]]
+repo = 'glidenote/memolist.vim'
+on_cmd = ['MemoGrep', 'MemoNew']
+hook_add = 'command! -nargs=0 MemoList  silent call memolist#list() | call memolist#list()'
+
+[[plugins]]
+repo = 'gregsexton/VimCalc'
+on_cmd = 'Calc'
+
+[[plugins]]
+repo = 'haya14busa/vim-textobj-number'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'an'], ['xo', 'in']]
+
+[[plugins]]
+repo = 'haya14busa/vim-undoreplay'
+on_cmd = 'UndoReplay'
+
+[[plugins]]
+repo = 'itchyny/calendar.vim'
+on_cmd = 'Calendar'
+on_map = [['nv', '<Plug>(calendar)']]
+
+[[plugins]]
+repo = 'jceb/vim-hier'
+on_cmd = ['HierUpdate', 'HierClear', 'HierStart', 'HierStop']
+on_ft = 'qf'
+
+[[plugins]]
+repo = 'joker1007/vim-markdown-quote-syntax'
+on_ft = 'markdown'
+hook_add = '''
+let g:markdown_quote_syntax_filetypes = {
+      \ 'c': {'start': 'c'},
+      \ 'cpp': {'start': 'cpp'},
+      \ 'html': {'start': 'html'},
+      \ 'java': {'start': 'java'},
+      \ 'javascript': {'start': 'javascript'},
+      \ 'perl': {'start': 'perl'},
+      \ 'python': {'start': 'python'},
+      \ 'ruby': {'start': 'ruby'},
+      \ 'vim': {'start': 'VimL'}
+      \}
+'''
+
+[[plugins]]
+repo = 'junegunn/goyo.vim'
+on_cmd = 'Goyo'
+hook_source = '''
+let g:goyo_margin_top = 0
+let g:goyo_margin_bottom = 0
+let g:goyo_linenr = 1
+let g:goyo_width = 100
+
+function! s:goyo_before() abort
+  setlocal colorcolumn=+1,+21
+  highlight ColorColumn ctermbg=Red guibg=Red
+endfunction
+function! s:goyo_after() abort
+  " Do nothing
+endfunction
+let g:goyo_callbacks = [function('s:goyo_before'), function('s:goyo_after')]
+'''
+
+[[plugins]]
+repo = 'kamichidu/vim-milqi'
+on_cmd = 'MilqiFromUnite'
+on_func = 'milqi'
+
+[[plugins]]
+repo = 'kana/vim-altr'
+on_map = [['cinov', '<Plug>(altr-']]
+hook_add = '''
+nmap <Space>a  <Plug>(altr-forward)
+nmap <Space>A  <Plug>(altr-back)
+'''
+
+[[plugins]]
+repo = 'kana/vim-textobj-entire'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'ae'], ['xo', 'ie']]
+
+[[plugins]]
+repo = 'kana/vim-textobj-fold'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'az'], ['xo', 'iz']]
+
+[[plugins]]
+repo = 'kana/vim-textobj-indent'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'ai'], ['xo', 'aI'], ['xo', 'ii'], ['xo', 'iI']]
+
+[[plugins]]
+repo = 'kana/vim-textobj-line'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'al'], ['xo', 'il']]
+
+[[plugins]]
+repo = 'kana/vim-textobj-syntax'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'ay'], ['xo', 'iy']]
+
+[[plugins]]
+repo = 'katono/rogue.vim'
+on_cmd = ['Rogue', 'RogueRestore', 'RogueResume', 'RogueScores']
+hook_add = '''
+let g:rogue#name = 'koturn'
+let g:rogue#japanese = 1
+'''
+hook_source = '''
+function! s:disable_indent_line() abort
+  if dein#is_sourced('indentLine')
+    IndentLinesDisable
+  endif
+endfunction
+autocmd MyAutoCmd FileType rogue call s:disable_indent_line()
+'''
+
+[[plugins]]
+repo = 'koturn/benchvimrc-vim'
+on_cmd = 'BenchVimrc'
+
+[[plugins]]
+repo = 'koturn/vim-atcoder'
+on_cmd = 'AtCoderSubmit'
+
+[[plugins]]
+repo = 'koturn/vim-brainfuck'
+on_cmd = ['BFExecute', 'BFTranslate2C']
+on_ft = 'brainfuck'
+hook_add = '''
+autocmd BufNewFile,BufRead *.b,*.brainfuck  setfiletype brainfuck
+let g:brainfuck#verbose = 1
+let g:brainfuck#use_lua = 1
+'''
+
+[[plugins]]
+repo = 'koturn/vim-clipboard'
+on_cmd = ['GetClip', 'PutClip']
+hook_add = '''
+nnoremap <silent> ,<Space>  :<C-u>PutClip<CR>
+nnoremap <silent> <Space>,  :<C-u>GetClip<CR>
+if has('unnamedplus')
+  let g:clipboard#clip_register = '@+'
+endif
+'''
+
+[[plugins]]
+repo = 'koturn/vim-kotemplate'
+depends = ['unite.vim', 'ctrlp.vim', 'alti.vim', 'vim-milqi']
+on_cmd = ['KoTemplateLoad', 'KoTemplateMakeProject', 'CtrlPKoTemplate', 'AltiKoTemplate', 'MilqiKoTemplate', 'FZFKoTemplate']
+on_func = 'kotemplate'
+on_source = ['unite.vim', 'denite.nvim']
+hook_add = '''
+augroup KoTemplate
+  autocmd!
+  autocmd BufNewFile * call dein#source('vim-kotemplate') | call kotemplate#auto_action()
+augroup END
+'''
+hook_source = '''
+function! s:get_filename(tag) abort
+  let filename = fnamemodify(expand('%'), ':t')
+  return filename ==# '' ? a:tag : filename
+endfunction
+function! s:get_basefilename(tag) abort
+  let basefilename = fnamemodify(expand('%'), ':t:r')
+  return basefilename ==# '' ? a:tag : basefilename
+endfunction
+function! s:get_filename_camel2capital(tag) abort
+  let basefilename = fnamemodify(expand('%'), ':t:r')
+  let basefilename = toupper(substitute(basefilename, '.\zs\(\u\)', '_\l\1', 'g'))
+  return basefilename ==# '' ? a:tag : basefilename
+endfunction
+function! s:get_filename_snake2pascal(tag) abort
+  let basefilename = fnamemodify(expand('%'), ':t:r')
+  let basefilename = substitute(basefilename, '^\(\l\)', '\u\1', '')
+  let basefilename = substitute(basefilename, '_\(\l\)', '\u\1', 'g')
+  return basefilename ==# '' ? a:tag : basefilename
+endfunction
+function! s:get_include_guard(tag) abort
+  return s:get_filename_camel2capital(a:tag) . '_' . toupper(fnamemodify(expand('%'), ':e'))
+endfunction
+function! s:move_cursor(tag) abort
+  if search(a:tag)
+    execute ('silent! normal! zO"_' . len(a:tag) . 'x')
+  endif
+  return ''
+endfunction
+let g:kotemplate#filter = {
+      \ 'pattern': {
+      \   'c': ['*.{c,h}'],
+      \   'cmake': ['CMakeLists.txt', '*.cmake'],
+      \   'cpp': ['*.{cc,cpp,cxx,h,hpp}'],
+      \   'cs': ['*.cs'],
+      \   'go': ['*.go'],
+      \   'kuin': ['*.kn'],
+      \   'lua': ['*.lua'],
+      \   'lisp': ['*.lisp'],
+      \   'scheme': ['*.scm'],
+      \   'html': ['*.html'],
+      \   'java': ['*.java'],
+      \   'javascript': ['*.js'],
+      \   'make': ['Makefile/*', 'Makefile', '*.mk'],
+      \   'markdown': ['*.md'],
+      \   'perl': ['*.perl'],
+      \   'php': ['*.php'],
+      \   'python': ['*.py'],
+      \   'ruby': ['*.rb'],
+      \   'sh': ['*.sh'],
+      \   'vim': ['*.vim'],
+      \   'xml': ['*.xml'],
+      \ },
+      \ 'function': 'glob'
+      \}
+let g:kotemplate#enable_autocmd = 1
+let g:kotemplate#auto_filetypes = keys(g:kotemplate#filter.pattern)
+" let g:kotemplate#autocmd_function = 'unite'
+let g:kotemplate#autocmd_function = 'ctrlp'
+let g:kotemplate#dir = '~/github/kotemplate/'
+let g:kotemplate#tag_actions = [{
+      \ '<+AUTHOR+>': 'koturn',
+      \ '<+MAIL_ADDRESS+>': get(g:private, 'gmail_address', ''),
+      \ '<+DATE+>': 'strftime("%Y %m/%d")',
+      \ '<+DATEFULL+>': 'strftime("%Y-%m-%d %H:%M:%S")',
+      \ '<+YEAR+>': 'strftime("%Y")',
+      \ '<+FILE+>': function('s:get_filename'),
+      \ '<+FILEBASE+>': function('s:get_basefilename'),
+      \ '<+FILE_CAPITAL+>': function('s:get_filename_camel2capital'),
+      \ '<+FILE_PASCAL+>': function('s:get_filename_snake2pascal'),
+      \ '<+INCLUDE_GUARD+>': function('s:get_include_guard'),
+      \ '<+DIR+>': 'split(expand("%:p:h"), "/")[-1]',
+      \ '<%=\(.\{-}\)%>': 'eval(submatch(1))',
+      \}, {
+      \ '<+CURSOR+>': function('s:move_cursor'),
+      \}]
+let vim_project_expr = 'fnamemodify(substitute(%%PROJECT%%, "^vim-", "", "g"), ":t:r") . ".vim"'
+let g:kotemplate#projects = {
+      \ 'vim': {
+      \   'autoload': {vim_project_expr : 'Vim/autoload.vim'},
+      \   'plugin': {vim_project_expr : 'Vim/plugin.vim'},
+      \   'README.md': 'Markdown/ReadMe.md',
+      \   'LICENSE': 'LicenseFile/MIT'
+      \ }, 'vim-vital': {
+      \   'autoload/vital/__latest__/Altcomplete.vim': 'Vim/vital.vim',
+      \ }, 'java': {
+      \   'src': {'Main.java': 'Java/Main.java'},
+      \   'bin': {},
+      \   'build.xml': 'Java/build.xml',
+      \   'Makefile': 'Makefile/java.mk',
+      \   '.gitignore': 'gitfile/java.gitignore'
+      \ }, 'web': {
+      \   'index.html': 'HTML/html5.html',
+      \   'css/main.css': {},
+      \   'js/main.js': 'JavaScript/module.js'
+      \ }, 'electron': {
+      \   'index.html': 'HTML/html5.html',
+      \   'main.js': 'JavaScript/electron.js',
+      \   'release.js': 'JavaScript/electron_release.js',
+      \   'package.json': 'Json/electron_package.json'
+      \ }, 'qt': {
+      \   'main.cpp': 'Cpp/Qt/main.cpp',
+      \   'MainWindow.cpp': 'Cpp/Qt/MainWindow.cpp',
+      \   'MainWindow.h': 'Cpp/Qt/MainWindow.h',
+      \   'MainWindow.ui': 'QtFiles/MainWindow.ui',
+      \   'Template.pro': 'QtFiles/Project.pro',
+      \   '.gitignore': 'gitfile/qt.gitignore'
+      \ }
+      \}
+'''
+
+[[plugins]]
+repo = 'koturn/vim-movewin'
+on_cmd = ['MoveWin', 'MoveWinLeft', 'MoveWinDown', 'MoveWinUp', 'MoveWinRight']
+on_map = [['nvoic', '<Plug>(movewin-']]
+hook_add = '''
+map  <Left>   <Plug>(movewin-left)
+map! <Left>   <Plug>(movewin-left)
+map  <Down>   <Plug>(movewin-down)
+map! <Down>   <Plug>(movewin-down)
+map  <Up>     <Plug>(movewin-up)
+map! <Up>     <Plug>(movewin-up)
+map  <Right>  <Plug>(movewin-right)
+map! <Right>  <Plug>(movewin-right)
+'''
+
+[[plugins]]
+repo = 'koturn/vim-mozaicfm'
+depends = 'vim-mplayer'
+on_cmd = ['CtrlPMozaicfm', 'MozaicfmPlayByNumber', 'MozaicfmStop', 'MozaicfmTogglePause', 'MozaicfmToggleMute', 'MozaicfmVolume', 'MozaicfmSpeed', 'MozaicfmSeek', 'MozaicfmRelSeek', 'MozaicfmShowInfo', 'MozaicfmUpdateChannel']
+on_source = 'unite.vim'
+hook_add = '''
+" call dein#source('vim-mplayer')
+" let mozaicfm#play_command = g:mplayer#mplayer
+let mozaicfm#verbose = 1
+'''
+
+[[plugins]]
+repo = 'koturn/vim-mplayer'
+depends = ['unite.vim', 'ctrlp.vim', 'alti.vim', 'vim-milqi']
+on_cmd = ['AltiMPlayer', 'AltiMPlayerMru', 'CtrlPMPlayer', 'CtrlPMPlayerMru', 'MilqiMPlayer', 'MilqiMPlayerMru', 'FZFMPlayer', 'FZFMPlayerMru', 'MPlayer', 'MPlayerEnqueue', 'MPlayerMru', 'MPlayerMruEnqueue', 'MPlayerMruUpdate', 'MPlayerMruReload', 'MPlayerMruClear', 'MPlayerCommand', 'MPlayerStop', 'MPlayerVolume', 'MPlayerVolumeBar', 'MPlayerSpeed', 'MPlayerEqualizer', 'MPlayerToggleMute', 'MPlayerTogglePause', 'MPlayerToggleRTTimeInfo', 'MPlayerLoop', 'MPlayerSeek', 'MPlayerSeekToHead', 'MPlayerSeekToEnd', 'MPlayerOperateWithKey', 'MPlayerPrev', 'MPlayerNext', 'MPlayerShowFileInfo', 'MPlayerCommand', 'MPlayerGetProperty', 'MPlayerSetProperty', 'MPlayerStepProperty', 'MPlayerHelp', 'MPlayerFlush']
+on_source = ['unite.vim', 'denite.nvim']
+hook_add = '''
+if has('win32')
+  let mplayer#mplayer = 'C:/CommonUtil/mplayer/mplayer.exe'
+else
+  let mplayer#mplayer = '/c/CommonUtil/mplayer/mplayer.exe'
+  let mplayer#use_win_mplayer_in_cygwin = 1
+endif
+let g:mplayer#suffixes = ['mp3', 'wav', 'ogg', 'flv', 'wmv', 'mp4']
+let g:mplayer#default_dir = '~/Music/'
+
+nnoremap [mplayer] <Nop>
+nmap ,m  [mplayer]
+nnoremap [mplayer]p  :<C-u>Unite mplayer<CR>
+nnoremap [mplayer]m  :<C-u>Unite mplayer_mru<CR>
+nnoremap [mplayer]s  :<C-u>MPlayerStop<CR>
+nnoremap [mplayer]v  :<C-u>MPlayerVolumeBar<CR>
+'''
+
+[[plugins]]
+repo = 'koturn/vim-nicovideo'
+on_cmd = ['CtrlPNicoVideo', 'NicoVideo', 'NicoVideoUpdateRanking', 'NicoVideoLogin', 'NicoVideoLogout']
+on_source = 'unite.vim'
+hook_add = '''
+let nicovideo#mplayer = 'C:/CommonUtil/smplayer/mplayer/mplayer'
+let nicovideo#mail_address = g:private.gmail_address
+let nicovideo#password = g:private.nicovideo_password
+let nicovideo#crt_file = expand('~/curl-ca-bundle.crt')
+'''
+
+[[plugins]]
+repo = 'koturn/vim-podcast'
+depends = ['vim-mplayer', 'denite.nvim', 'unite.vim', 'ctrlp.vim', 'alti.vim']
+on_cmd = ['PodcastStop', 'PodcastUpdate', 'CtrlPPodcast', 'AltiPodcast']
+on_source = ['denite.nvim', 'unite.vim']
+hook_add = 'let podcast#verbose = 1'
+
+[[plugins]]
+repo = 'koturn/vim-rawsearch'
+on_cmd = 'ToggleRawSearch'
+
+[[plugins]]
+repo = 'koturn/vim-rebuildfm'
+depends = 'vim-mplayer'
+on_cmd = ['CtrlPRebuildfm', 'RebuildfmPlayByNumber', 'RebuildfmLiveStream', 'RebuildfmStop', 'RebuildfmTogglePause', 'RebuildfmToggleMute', 'RebuildfmVolume', 'RebuildfmSpeed', 'RebuildfmSeek', 'RebuildfmRelSeek', 'RebuildfmShowInfo', 'RebuildfmUpdateChannel']
+on_source = 'unite.vim'
+hook_add = '''
+" call dein#source('vim-mplayer')
+" let rebuildfm#play_command = g:mplayer#mplayer
+let rebuildfm#verbose = 1
+'''
+
+[[plugins]]
+repo = 'koturn/vim-replica'
+on_cmd = ['Replica', 'ReplicaInternal']
+
+[[plugins]]
+repo = 'koturn/vim-resizewin'
+on_cmd = ['Resizewin', 'ResizewinByOffset', 'ResizewinStartFullScreen', 'ResizewinStopFullScreen', 'ResizewinToggleFullScreen']
+on_map = [['nvoic', '<Plug>(resizewin-']]
+hook_add = '''
+map  <F11>      <Plug>(resizewin-toggle-fullscreen)
+map! <F11>      <Plug>(resizewin-toggle-fullscreen)
+map  <M-F11>    <Plug>(resizewin-toggle-fullscreen)
+map! <M-F11>    <Plug>(resizewin-toggle-fullscreen)
+map  <S-Left>   <Plug>(resizewin-contract-columns)
+map! <S-Left>   <Plug>(resizewin-contract-columns)
+map  <S-Down>   <Plug>(resizewin-expand-lines)
+map! <S-Down>   <Plug>(resizewin-expand-lines)
+map  <S-Up>     <Plug>(resizewin-contract-lines)
+map! <S-Up>     <Plug>(resizewin-contract-lines)
+map  <S-Right>  <Plug>(resizewin-expand-columns)
+map! <S-Right>  <Plug>(resizewin-expand-columns)
+'''
+
+[[plugins]]
+repo = 'koturn/vim-themostdangerouswritingapp'
+on_cmd = ['TheMostDangerousWritingAppEnable', 'TheMostDangerousWritingAppDisable']
+
+[[plugins]]
+repo = 'koturn/weather.vim'
+on_cmd = 'Weather'
+
+[[plugins]]
+repo = 'lambdalisue/gina.vim'
+on_cmd = 'Gina'
+
+[[plugins]]
+repo = 'losingkeys/vim-niji'
+on_ft = ['lisp', 'scheme', 'clojure']
+on_path = ['\.lisp$', '\.scm$', '\.clojure$']
+
+[[plugins]]
+repo = 'lucapette/vim-textobj-underscore'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'a_'], ['xo', 'i_']]
+
+[[plugins]]
+repo = 'majutsushi/tagbar'
+on_cmd = ['Tagbar', 'TagbarToggle', 'TagbarOpen', 'TagbarOpenAutoClose', 'TagbarClose', 'TagbarSetFoldlevel', 'TagbarShowTag', 'TagbarCurrentTag', 'TagbarGetTypeConfig', 'TagbarDebug', 'TagbarDebugEnd', 'TagbarTogglePause']
+
+[[plugins]]
+repo = 'mattn/ctrlp-jazzradio'
+depends = 'ctrlp.vim'
+on_cmd = 'CtrlPJazzradio'
+
+[[plugins]]
+repo = 'mattn/ctrlp-launcher'
+depends = 'ctrlp.vim'
+on_cmd = 'CtrlPLauncher'
+on_map = '<plug>(ctrlp-launcher)'
+
+[[plugins]]
+repo = 'mattn/emmet-vim'
+on_cmd = ['EmmetInstall', 'Emmet']
+on_ft = ['html', 'css', 'markdown']
+hook_add = '''
+let g:user_emmet_install_global = 0
+autocmd MyAutoCmd FileType html,css,markdown  EmmetInstall
+'''
+
+[[plugins]]
+repo = 'mattn/emoji-vim'
+on_cmd = 'Emoji'
+
+[[plugins]]
+repo = 'mattn/excitetranslate-vim'
+depends = 'webapi-vim'
+on_cmd = 'ExciteTranslate'
+
+[[plugins]]
+repo = 'mattn/gist-vim'
+depends = 'webapi-vim'
+on_cmd = 'Gist'
+
+[[plugins]]
+repo = 'mattn/startmenu-vim'
+depends = ['webapi-vim', 'ctrlp.vim', 'unite.vim']
+on_cmd = 'StartMenu'
+on_source = 'unite.vim'
+hook_add = '''
+let g:startmenu_interface = 'unite'
+'''
+
+[[plugins]]
+repo = 'mattn/vim-textobj-url'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'au'], ['xo', 'iu']]
+
+[[plugins]]
+repo = 'mopp/AOJ.vim'
+depends = ['webapi-vim', 'unite.vim']
+on_cmd = ['AOJSubmit', 'AOJSubmitByProblemID', 'AOJViewProblems', 'AOJViewStaticticsLogs']
+
+[[plugins]]
+repo = 'mopp/makecomp.vim'
+on_cmd = 'Make'
+
+[[plugins]]
+repo = 'osyo-manga/vim-anzu'
+on_cmd = ['AnzuClearSearchStatus', 'AnzuClearSearchCache', 'AnzuUpdateSearchStatus', 'AnzuUpdateSearchStatusOutput', 'AnzuSignMatchLine', 'AnzuClearSignMatchLine']
+on_map = [['nxo', '<Plug>(anzu-']]
+hook_add = '''
+let g:anzu_bottomtop_word = 'search hit BOTTOM, continuing at TOP'
+let g:anzu_topbottom_word = 'search hit TOP, continuing at BOTTOM'
+let g:anzu_status_format  = '%p(%i/%l) %w'
+nmap n  <Plug>(anzu-n-with-echo)zz
+nmap N  <Plug>(anzu-N-with-echo)zz
+nmap *  <Plug>(anzu-star-with-echo)Nzz
+nmap #  <Plug>(anzu-sharp-with-echo)Nzz
+nnoremap g*  g*Nzz
+nnoremap g#  g#Nzz
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-over'
+on_cmd = ['OverCommandLine', 'OverCommandLineNoremap', 'OverCommandLineMap', 'OverCommandLineUnmap']
+
+[[plugins]]
+repo = 'osyo-manga/vim-reanimate'
+on_cmd = ['ReanimateSave', 'ReanimateSaveCursorHold', 'ReanimateSaveInput', 'ReanimateLoad', 'ReanimateLoadInput', 'ReanimateLoadLatest', 'ReanimateSwitch', 'ReanimateEditVimrcLocal', 'ReanimateUnLoad']
+hook_add = '''
+let g:reanimate_save_dir = $DOTVIM . '/save'
+let g:reanimate_default_save_name = 'reanimate'
+let g:reanimate_sessionoptions = 'curdir,folds,help,localoptions,slash,tabpages,winsize'
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-snowdrop'
+on_ft = ['c', 'cpp']
+hook_add = '''
+let g:snowdrop#libclang_directory = 'C:/msys64/mingw64/lib'
+let g:snowdrop#command_options = {
+      \ 'cpp': '-std=c++1y',
+      \}
+let g:snowdrop#include_paths = {
+      \ 'cpp': [
+      \   'C:/msys64/mingw64/include/c++/5.3.0'
+      \ ]
+      \}
+let g:neocomplete#sources#snowdrop#enable = 1
+let g:neocomplete#skip_auto_completion_time = ''
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-sugarpot'
+on_cmd = ['SugarpotRenderImage', 'SugarpotPreview', 'SugarpotClosePreview', 'SugarpotClosePreviewAll']
+hook_add = '''
+let g:sugarpot_convert = get(g:private, 'imagemagick_path', 'convert')
+let g:sugarpot_convert_resize = '50%x25%'
+'''
+
+[[plugins]]
+repo = 'osyo-manga/vim-textobj-multiblock'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'ab'], ['xo', 'ib'], ['xo', '<Plug>(textobj-multiblock-']]
+
+[[plugins]]
+repo = 'pocket7878/presen-vim'
+depends = 'curses-vim'
+on_cmd = ['Presen', 'Vp2html']
+on_ft = 'vimpresen'
+
+[[plugins]]
+repo = 'previm/previm'
+on_cmd = 'PrevimOpen'
+hook_source = '''
+call dein#source('open-browser.vim')
+'''
+
+[[plugins]]
+repo = 'rbtnn/puyo.vim'
+on_cmd = 'Puyo'
+
+[[plugins]]
+repo = 'rbtnn/vimconsole.vim'
+on_cmd = ['VimConsoleOpen', 'VimConsoleRedraw', 'VimConsoleClose', 'VimConsoleClear', 'VimConsoleToggle', 'VimConsoleLog', 'VimConsoleSaveSession', 'VimConsoleLoadSession']
+
+[[plugins]]
+repo = 'rhysd/accelerated-jk'
+on_map = [['n', '<Plug>(accelerated_jk_']]
+hook_add = '''
+nmap <C-j> <Plug>(accelerated_jk_gj)
+nmap <C-k> <Plug>(accelerated_jk_gk)
+'''
+
+[[plugins]]
+repo = 'rhysd/clever-f.vim'
+on_map = [['nxo', '<Plug>(clever-f-']]
+hook_add = '''
+map f  <Plug>(clever-f-f)
+map F  <Plug>(clever-f-F)
+map t  <Plug>(clever-f-t)
+map T  <Plug>(clever-f-T)
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-clang-format'
+depends = 'vim-operator-user'
+on_cmd = ['ClangFormat', 'ClangFormatEchoFormattedCode', 'ClangFormatAutoToggle']
+on_map = '<Plug>(operator-clang-format)'
+hook_add = '''
+let g:clang_format#style_options = {
+      \ 'BasedOnStyle': 'Google',
+      \ 'AccessModifierOffset': -2,
+      \ 'AlignEscapedNewlinesLeft': 'false',
+      \ 'AlignTrailingComments': 'false',
+      \ 'AlwaysBreakAfterDefinitionReturnType': 'All',
+      \ 'AlwaysBreakAfterReturnType': 'All',
+      \ 'BraceWrapping': {
+      \   'AfterClass': 'true',
+      \   'AfterEnum': 'true',
+      \   'AfterFunction': 'true',
+      \   'AfterNamespace': 'true',
+      \   'AfterStruct': 'true',
+      \   'AfterUnion': 'true'
+      \ },
+      \ 'BreakBeforeBraces': 'Custom',
+      \ 'BreakConstructorInitializersBeforeComma': 'true',
+      \ 'ColumnLimit': 0,
+      \ 'ConstructorInitializerAllOnOneLineOrOnePerLine': 'false',
+      \ 'ConstructorInitializerIndentWidth': 2,
+      \ 'ContinuationIndentWidth': 2,
+      \ 'IndentWidth': 2,
+      \ 'TabWidth': 4
+      \}
+map ,x  <Plug>(operator-clang-format)
+'''
+
+[[plugins]]
+repo = 'rhysd/vim-grammarous'
+on_cmd = ['GrammarousCheck', 'GrammarousReset']
+on_map = [['n', '<Plug>(grammarous-']]
+
+[[plugins]]
+repo = 'rhysd/wandbox-vim'
+on_cmd = ['Wandbox', 'WandboxAsync', 'WandboxSync', 'WandboxOptionList', 'WandboxOptionListAsync', 'WandboxAbortAsyncWorks', 'WandboxOpenBrowser']
+hook_add = '''
+let g:wandbox#default_compiler = {
+      \ 'cpp': 'clang-head',
+      \ 'ruby': 'ruby-1.9.3-p0',
+      \}
+let g:wandbox#default_options = {
+      \ 'cpp': 'warning,optimize,boost-1.55,sprout',
+      \ 'haskell': ['haskell-warning', 'haskell-optimize']
+      \}
+'''
+
+[[plugins]]
+repo = 'shime/vim-livedown'
+on_cmd = ['LivedownPreview', 'LivedownKill', 'LivedownToggle']
+
+[[plugins]]
+repo = 'thinca/vim-prettyprint'
+on_cmd = ['PrettyPrint', 'PP']
+on_func = 'prettyprint'
+
+[[plugins]]
+repo = 'thinca/vim-quickrun'
+on_cmd = 'QuickRun'
+on_map = [['n', '<Plug>(quickrun']]
+hook_source = '''
+call pluginconfig#quickrun()
+delfunction pluginconfig#quickrun
+nnoremap <expr><silent><C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
+nnoremap <Leader>r  :<C-u>QuickRun -exec '%C %S'<CR>
+'''
+
+[[plugins]]
+repo = 'thinca/vim-ref'
+depends = 'vimproc.vim'
+on_cmd = 'Ref'
+on_map = [['nv', '<Plug>(ref-keyword)']]
+hook_add = '''
+nnoremap [ref] <Nop>
+nmap ,r  [ref]
+nnoremap [ref]a   :<C-u>Ref webdict alc<Space>
+nnoremap [ref]e   :<C-u>Ref webdict Ej<Space>
+nnoremap [ref]E   :<C-u>Ref webdict ej<Space>
+nnoremap [ref]j   :<C-u>Ref webdict je<Space>
+nnoremap [ref]dn  :<C-u>Ref webdict dn<Space>
+nnoremap [ref]k   :<C-u>execute 'Ref webdict ej ' . expand('<cword>')<CR>
+'''
+hook_source = '''
+call pluginconfig#ref()
+delfunction pluginconfig#ref
+'''
+
+[[plugins]]
+repo = 'thinca/vim-scouter'
+on_cmd = 'Scouter'
+
+[[plugins]]
+repo = 'thinca/vim-showtime'
+on_cmd = ['ShowtimeStart', 'ShowtimeResume']
+
+[[plugins]]
+repo = 'thinca/vim-textobj-between'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'af'], ['xo', 'if'], ['xo', '<Plug>(textobj-between-']]
+
+[[plugins]]
+repo = 'thinca/vim-threes'
+on_cmd = ['ThreesStart', 'ThreesShowRecord']
+
+[[plugins]]
+repo = 'thinca/vim-visualstar'
+on_map = [['nvo', '<Plug>(visualstar-']]
+hook_add = '''
+let g:visualstar_no_default_key_mappings = 1
+xmap *   <Plug>(visualstar-*)
+xmap #   <Plug>(visualstar-#)
+xmap g*  <Plug>(visualstar-g*)
+xmap g#  <Plug>(visualstar-g#)
+xmap <kMultiply>     <Plug>(visualstar-*)
+xmap g<kMultiply>    <Plug>(visualstar-g*)
+vmap <S-LeftMouse>   <Plug>(visualstar-*)
+vmap g<S-LeftMouse>  <Plug>(visualstar-g*)
+'''
+
+[[plugins]]
+repo = 'tpope/vim-surround'
+on_map = [['n', '<Plug>Dsurround'], ['n', '<Plug>Csurround'], ['n', '<Plug>Ysurround'], ['n', '<Plug>YSurround'], ['n', '<Plug>Yssurround'], ['n', '<Plug>YSsurround'], ['v', '<Plug>VSurround'], ['v', '<Plug>VgSurround']]
+hook_add = '''
+nmap ds   <Plug>Dsurround
+nmap cs   <Plug>Csurround
+nmap ys   <Plug>Ysurround
+nmap yS   <Plug>YSurround
+nmap yss  <Plug>Yssurround
+nmap ySs  <Plug>YSsurround
+nmap ySS  <Plug>YSsurround
+xmap S    <Plug>VSurround
+xmap gS   <Plug>VgSurround
+'''
+
+[[plugins]]
+repo = 'tsukkee/lingr-vim'
+on_cmd = 'LingrLaunch'
+
+[[plugins]]
+repo = 'tyru/capture.vim'
+on_cmd = 'Capture'
+
+[[plugins]]
+repo = 'tyru/caw.vim'
+on_map = [['nv', '<Plug>(caw:hatpos:']]
+hook_add = '''
+nmap <Leader>c  <Plug>(caw:hatpos:toggle)
+xmap <Leader>c  <Plug>(caw:hatpos:toggle)
+'''
+
+[[plugins]]
+repo = 'tyru/eskk.vim'
+on_map = [['nicl', '<Plug>(eskk:']]
+hook_add = 'call hookadd#eskk()'
+hook_source = '''
+" let g:eskk#enable_completion = 1
+let g:eskk#start_completion_length = 2
+let g:eskk#show_candidates_count = 2
+let g:eskk#egg_like_newline_completion = 1
+if !has('gui_running')
+  let g:eskk#marker_henkan = '»'
+  let g:eskk#marker_okuri = '*'
+  let g:eskk#marker_henkan_select = '«'
+  let g:eskk#marker_jisyo_touroku = '?'
+endif
+let g:eskk#dictionary = {'path' : '~/.skk-jisyo', 'sorted' : 0, 'encoding' : 'utf-8'}
+let g:eskk#large_dictionary = {'path' : '~/.eskk/SKK-JISYO.L', 'sorted' : 1, 'encoding' : 'utf-8'}
+let g:eskk#debug = 0
+" let g:eskk#rom_input_style = 'msime'
+let g:eskk#revert_henkan_style = 'okuri'
+let g:eskk#egg_like_newline = 1
+let g:eskk#keep_state = 1
+
+function! s:eskk_map() abort
+  let table = eskk#table#new('rom_to_hira*', 'rom_to_hira')
+  call s:eskk_map_zenkaku(table)
+  call eskk#register_mode_table('hira', table)
+  let table = eskk#table#new('rom_to_kata*', 'rom_to_kata')
+  call s:eskk_map_zenkaku(table)
+  call eskk#register_mode_table('kata', table)
+endfunction
+
+function! s:eskk_map_zenkaku(table) abort
+  call a:table.add_map(',', '，')
+  call a:table.add_map('.', '．')
+
+  call a:table.add_map('0', '０')
+  call a:table.add_map('1', '１')
+  call a:table.add_map('2', '２')
+  call a:table.add_map('3', '３')
+  call a:table.add_map('4', '４')
+  call a:table.add_map('5', '５')
+  call a:table.add_map('6', '６')
+  call a:table.add_map('7', '７')
+  call a:table.add_map('8', '８')
+  call a:table.add_map('9', '９')
+
+  call a:table.add_map('"', '”')
+  call a:table.add_map('#', '＃')
+  call a:table.add_map('$', '＄')
+  call a:table.add_map('%', '％')
+  call a:table.add_map('&', '＆')
+  call a:table.add_map("'", '’')
+  call a:table.add_map('(', '（')
+  call a:table.add_map(')', '）')
+
+  call a:table.add_map('=', '＝')
+  call a:table.add_map('~', '～')
+  call a:table.add_map('|', '｜')
+  call a:table.add_map('@', '＠')
+  call a:table.add_map('`', '‘')
+  call a:table.add_map('{', '｛')
+  call a:table.add_map('+', '＋')
+  call a:table.add_map('*', '＊')
+  call a:table.add_map('}', '｝')
+  call a:table.add_map('<', '＜')
+  call a:table.add_map('>', '＞')
+  call a:table.add_map('\', '￥')
+  call a:table.add_map('_', '＿')
+  call a:table.add_map(' ', '　')
+endfunction
+autocmd MyAutoCmd User eskk-initialize-pre  call s:eskk_map()
+
+if !filereadable(expand(g:eskk#large_dictionary.path))
+  let dirpath = fnamemodify(expand(g:eskk#large_dictionary.path), ':h')
+  if !isdirectory(dirpath)
+    call mkdir(iconv(dirpath, &enc, &tenc), 'p')
+  endif
+  call s:update_skk_dict()
+endif
+'''
+
+[[plugins]]
+repo = 'tyru/open-browser.vim'
+on_cmd = ['OpenBrowser', 'OpenBrowserSearch', 'OpenBrowserSmartSearch']
+on_func = 'openbrowser'
+on_map = [['nv', '<Plug>(openbrowser-']]
+hook_add = '''
+function! s:execute_with_selected_text(command) abort
+  if a:command !~? '%s'
+    return
+  endif
+  let reg = '"'
+  let [save_reg, save_type] = [getreg(reg), getregtype(reg)]
+  normal! gvy
+  let selectedText = @"
+  call setreg(reg, save_reg, save_type)
+  if selectedText ==# ''
+    return
+  endif
+  execute printf(a:command, selectedText)
+endfunction
+nmap <Space>o  <Plug>(openbrowser-smart-search)
+nmap <Space>O  :<C-u>OpenBrowserSmartSearch<Space>
+nnoremap gz  vi':<C-u>call <SID>execute_with_selected_text('call openbrowser#open("https://github.com/%s")')<CR>
+vnoremap gz  :<C-u>call <SID>execute_with_selected_text('call openbrowser#open("https://github.com/%s")')<CR>
+'''
+
+[[plugins]]
+repo = 'tyru/restart.vim'
+on_cmd = 'Restart'
+
+[[plugins]]
+repo = 'vim-jp/vital.vim'
+on_cmd = 'Vitalize'
+on_func = 'vital'
+
+[[plugins]]
+repo = 'vim-scripts/Conque-Shell'
+on_cmd = 'ConqueTerm'
+hook_add = '''
+let g:ConqueTerm_FastMode = 1
+let g:ConqueTerm_ReadUnfocused = 1
+let g:ConqueTerm_InsertOnEnter = 1
+" let g:ConqueTerm_PromptRegex = '^-->'
+" let g:ConqueTerm_TERM = 'xterm'
+'''
+
+[[plugins]]
+repo = 'vim-scripts/DoxygenToolkit.vim'
+on_cmd = ['Dox', 'DoxLic', 'DoxAuthor', 'DoxUndoc', 'DoxBlock']
+
+[[plugins]]
+repo = 'vim-scripts/DrawIt'
+on_cmd = ['DrawIt', 'DIstart', 'DIstop', 'DInrml', 'DIsngl', 'DIdbl']
+on_map = [['nxo', '<Plug>DrawIt']]
+hook_add = '''
+map <Leader>di  <Plug>DrawItStart
+map <Leader>ds  <Plug>DrawItStop
+'''
+
+[[plugins]]
+repo = 'vim-scripts/java_getset.vim'
+on_ft = 'java'
+
+[[plugins]]
+repo = 'vim-scripts/jcommenter.vim'
+on_ft = 'java'
+
+[[plugins]]
+repo = 'vim-scripts/ruby-matchit'
+on_ft = 'ruby'
+
+[[plugins]]
+repo = 'vim-scripts/tagexplorer.vim'
+on_cmd = 'TagExplorer'
+on_ft = ['cpp', 'java', 'perl', 'python', 'ruby', 'tags']
+
+[[plugins]]
+repo = 'yuratomo/gmail.vim'
+on_cmd = ['Gmail', 'GmailChangeUser', 'GmailExit', 'GmailCheckNewMail']
+hook_add = '''
+let g:gmail_user_name = get(g:private, 'gmail_address', '')
+'''
+
+[[plugins]]
+repo = 'yuratomo/w3m.vim'
+on_cmd = ['W3m', 'W3mTab', 'W3mSplit', 'W3mVSplit', 'W3mLocal', 'W3mHistory', 'W3mHistoryClear']
+
+[[plugins]]
+repo = 'thinca/vim-fontzoom'
+if = "has('gui_running')"
+on_cmd = 'Fontzoom'
+on_map = [['n', '<Plug>(fontzoom-']]
+hook_add = '''
+nmap +  <Plug>(fontzoom-larger)
+nmap -  <Plug>(fontzoom-smaller)
+map  <C-ScrollWheelUp>    <Plug>(fontzoom-larger)
+map! <C-ScrollWheelUp>    <Plug>(fontzoom-larger)
+map  <C-ScrollWheelDown>  <Plug>(fontzoom-smaller)
+map! <C-ScrollWheelDown>  <Plug>(fontzoom-smaller)
+'''
+
+[[plugins]]
+repo = 'koturn/vim-kolor'
+on_cmd = ['KolorShowPalette256', 'KolorEcho', 'KolorEchoNr']
+on_func = 'kolor'

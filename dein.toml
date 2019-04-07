@@ -1,0 +1,157 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+repo = 'fsharp/vim-fsharp'
+
+[[plugins]]
+repo = 'neovim/pynvim'
+
+[[plugins]]
+repo = 'roxma/nvim-yarp'
+if = "!has('nvim')"
+on_func = 'yarp'
+
+[[plugins]]
+repo = 'roxma/vim-hug-neovim-rpc'
+if = "!has('nvim')"
+on_func = 'neovim_rpc'
+
+[[plugins]]
+repo = 'Yggdroot/indentLine'
+
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+if = "has('gui_running') || &t_Co >= 16"
+hook_add = 'call hookadd#lightline()'
+
+[[plugins]]
+repo = 'sgur/vim-editorconfig'
+
+[[plugins]]
+repo = 'vim-jp/vimdoc-ja'
+
+[[plugins]]
+repo = 'thinca/vim-themis'
+
+[[plugins]]
+repo = 'cocopon/iceberg.vim'
+
+[[plugins]]
+repo = 'koturn/vim-serverutil'
+
+[[plugins]]
+repo = 'Mizuchi/STL-Syntax'
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
+repo = 'basyura/twibill.vim'
+
+[[plugins]]
+repo = 'brgmnn/vim-opencl'
+
+[[plugins]]
+repo = 'elzr/vim-json'
+
+[[plugins]]
+repo = 'hail2u/vim-css3-syntax'
+
+[[plugins]]
+repo = 'heavenshell/vim-jsdoc'
+
+[[plugins]]
+repo = 'janko-m/vim-test'
+
+[[plugins]]
+repo = 'kana/vim-operator-user'
+
+[[plugins]]
+repo = 'kana/vim-textobj-django-template'
+
+[[plugins]]
+repo = 'kana/vim-textobj-user'
+
+[[plugins]]
+repo = 'koturn/vim-altcomplete'
+
+[[plugins]]
+repo = 'koturn/vim-venchmark'
+
+[[plugins]]
+repo = 'lilydjwg/colorizer'
+
+[[plugins]]
+repo = 'mattn/webapi-vim'
+
+[[plugins]]
+repo = 'octol/vim-cpp-enhanced-highlight'
+hook_add = '''
+let g:cpp_class_scope_highlight = 1
+let g:cpp_experimental_template_highlight = 1
+'''
+
+[[plugins]]
+repo = 'othree/html5-syntax.vim'
+
+[[plugins]]
+repo = 'pangloss/vim-javascript'
+
+[[plugins]]
+repo = 'pocket7878/curses-vim'
+
+[[plugins]]
+repo = 'rhysd/tmpwin.vim'
+
+[[plugins]]
+repo = 'tatt61880/kuin_vim'
+hook_add = 'autocmd MyAutoCmd BufReadPre *.kn  setfiletype kuin'
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'ujihisa/vimshell-ssh'
+
+[[plugins]]
+repo = 'vim-scripts/CCTree'
+
+[[plugins]]
+repo = 'vim-scripts/gnuplot.vim'
+hook_add = '''
+autocmd MyAutoCmd BufReadPre *.plt  setfiletype gnuplot
+'''
+
+[[plugins]]
+repo = 'osyo-manga/unite-boost-online-doc'
+
+[[plugins]]
+repo = 'osyo-manga/unite-highlight'
+
+[[plugins]]
+repo = 'sorah/unite-ghq'
+
+[[plugins]]
+repo = 'tacroe/unite-mark'
+
+[[plugins]]
+repo = 'tsukkee/unite-help'
+
+[[plugins]]
+repo = 'tsukkee/unite-tag'
+
+[[plugins]]
+repo = 'ujihisa/unite-colorscheme'
+
+[[plugins]]
+repo = 'ujihisa/unite-font'
+
+[[plugins]]
+repo = 'yomi322/unite-tweetvim'
+
+[[plugins]]
+repo = 'Shougo/unite-outline'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
