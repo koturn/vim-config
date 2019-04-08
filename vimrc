@@ -695,6 +695,19 @@ function! s:auto_mkdir(dir, force) abort
 endfunction
 autocmd MyAutoCmd BufWritePre * call s:auto_mkdir(expand('<afile>:p:h'), v:cmdbang)
 
+function! Tapi_Drop(bufnum, arglist) abort " {{{
+  let [pwd, argv] = [a:arglist[0] . '/', a:arglist[1 :]]
+  for arg in map(argv, 'pwd . v:val')
+    execute 'drop ' . fnameescape(arg)
+  endfor
+endfunction " }}}
+
+autocmd MyAutoCmd TerminalOpen *bash*,*zsh* call term_sendkeys(bufnr('%'), join([
+      \ 'function vimterm_quote_args() { for a in "$@"; do echo ", \"$a\""; done; }',
+      \ 'function vimterm_drop() { echo -e "\e]51;[\"call\", \"Tapi_Drop\", [\"$PWD\" `vimterm_quote_args "$@"`]]\x07"; }',
+      \ 'alias vim=vimterm_drop'
+      \], "\n") . "\n")
+
 
 " Command of 'which' for vim command.
 function! s:cmd_which(cmd) abort
@@ -854,7 +867,12 @@ xnoremap ,s  :<C-u>call <SID>store_selected_text()<CR>/<C-u><C-r>"<CR>N
 xnoremap ,S  :<C-u>call <SID>store_selected_text(0)<CR>/<C-u>\m<C-r>"<CR>N
 xnoremap ,<C-s>  :<C-u>call <SID>store_selected_text(1)<CR>/<C-u>\M<C-r>"<CR>N
 xnoremap ,<M-s>  :<C-u>call <SID>store_selected_text(2)<CR>/<C-u>\v<C-r>"<CR>N
-
+" function! s:easy_vimgrep(...) abort
+"   let text = s:get_selected_text()
+"   return 'vimgrep /' . text . '/ *.c' . repeat("\<Left>", 6)
+" endfunction
+" xnoremap <expr> ,g  <SID>easy_vimgrep()
+xnoremap ,g  :<C-u>call <SID>store_selected_text()<CR>:<C-u>vimgrep/<C-r>"/ **/*<Left><Left><Left><Left><Left><Left>
 
 " Complete HTML tag
 function! s:complete_tag() abort
@@ -1238,13 +1256,73 @@ if has('terminal')
   command! -bar -nargs=? -complete=customlist,s:complete_term_bufname Terminal  call s:term_open_existing(<q-mods>, <f-args>)
 endif
 
+
+function! s:show_highlight_info(lnum, col) abort " {{{
+  for synid in synstack(a:lnum, a:col)
+    let hldef_dict = s:generate_hldef_dict({}, synid)
+    let name = synIDattr(synid, 'name')
+    echo name
+    while has_key(hldef_dict[name], 'link')
+      let name2 = hldef_dict[name].link
+      echo printf('  highlight! link %s %s', name, name2)
+      let name = name2
+    endwhile
+    if has_key(hldef_dict[name], 'def')
+      echo printf('  ' . hldef_dict[name].def)
+    endif
+  endfor
+endfunction " }}}
+
+function! s:generate_hldef_dict(hldef_dict, synid1) abort " {{{
+  let [synid2, name1] = [synIDtrans(a:synid1), synIDattr(a:synid1, 'name')]
+  if a:synid1 == synid2
+    let hldef = substitute(printf('highlight! %s %s %s %s %s %s',
+          \ name1,
+          \ s:generate_colordef(a:synid1, 'cterm'),
+          \ s:generate_attr(a:synid1, 'cterm'),
+          \ s:generate_colordef(a:synid1, 'gui'),
+          \ s:generate_attr(a:synid1, 'gui'),
+          \ s:generate_attr(a:synid1, 'term')), '\%(\s\zs\s\+\|\s\+$\)', '', 'g')
+    return extend(a:hldef_dict, {
+          \ name1: {
+          \   'id': a:synid1,
+          \   'def': hldef
+          \ }
+          \})
+  else
+    return s:generate_hldef_dict(extend(a:hldef_dict, {
+          \ name1: {
+          \   'id': a:synid1,
+          \   'link': synIDattr(synid2, 'name')
+          \ }
+          \}), synid2)
+  endif
+endfunction " }}}
+
+function! s:generate_colordef(synid, mode) abort " {{{
+  let colordef_list = []
+  for what in ['fg#', 'bg#']
+    let color = synIDattr(a:synid, what, a:mode)
+    if color !=# ''
+      call add(colordef_list, a:mode . what[: 1] . '=' . color)
+    endif
+  endfor
+  return join(colordef_list)
+endfunction " }}}
+
+function! s:generate_attr(synid, mode) abort " {{{
+  let attrs = filter(['bold', 'italic', 'reverse', 'standout', 'underline', 'undercurl', 'strikethrough'], "synIDattr(a:synid, v:val, a:mode) is# '1'")
+  return len(attrs) == 0 ? '' : (a:mode . '=' . join(attrs, ','))
+endfunction " }}}
+
+command! -bar ShowHlGroup  call s:show_highlight_info(line('.'), col('.'))
+
 " by ujihisa
 command! -count=1 -nargs=0 GoToTheLine  silent execute getpos('.')[1][: -len(v:count) - 1] . v:count
 nnoremap <silent> gl  :<C-u>GoToTheLine<CR>
 
 " Show highlight group name under a cursor
 command! -bar ShowRuntimePath  echo join(split(&runtimepath, ','), "\n")
-command! -bar ShowHlGroup  echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
 command! -bar Rot13  normal! mzggg?G`z
 command! -bar RandomString  echo sha256(reltimestr(reltime()))[: 7]
 command! -nargs=1 GrepCurrent  vimgrep <args> % | cwindow
