@@ -13,8 +13,7 @@
 " ------------------------------------------------------------
 scriptencoding utf-8
 
-set winaltkeys=no  " Turns off the Alt key bindings to the gui menu
-set cursorline cursorcolumn
+set winaltkeys=no
 set guicursor+=a:blinkon0
 
 function! s:get_sid_prefix() abort
@@ -23,22 +22,16 @@ endfun
 let s:sid_prefix = s:get_sid_prefix()
 delfunction s:get_sid_prefix
 
-function! s:balloon_expr() abort
-  let lnum = foldclosed(v:beval_lnum)
-  if lnum == -1
-    return ''
-  endif
-  let lines = getline(lnum, foldclosedend(lnum))
-  return iconv(join(len(lines) > &lines ? lines[: &lines] : lines, "\n"), &enc, &tenc)
-endfunction
+function! s:balloon_expr() abort " {{{
+  return vimrc#get_highlight_info_lines(v:beval_lnum, v:beval_col)
+endfunction " }}}
 let &g:balloonexpr = s:sid_prefix . 'balloon_expr()'
 set ballooneval
 
 " Change cursor color depending on state of IME.
 if has('multi_byte_ime') || has('xim')
   autocmd MyAutoCmd Colorscheme * hi CursorIM guifg=NONE guibg=Orange
-  " Default state of IME on insert mode and searching mode.
-  set iminsert=0 imsearch=0  " for no KaoriYa WIN gvim
+  set iminsert=0 imsearch=0
 endif
 
 if exists('+antialias')
