@@ -21,7 +21,7 @@ endif
 let s:startuptime = reltime()
 
 let s:is_nvim    =  has('nvim')
-let g:is_windows =  has('win16') || has('win32') || has('win64')
+let g:is_windows =  has('win32')
 let g:is_cygwin  =  has('win32unix')
 let g:is_mac     = !g:is_windows && (has('mac') || has('macunix') || has('gui_macvim')
       \ || (!isdirectory('/proc') && executable('sw_vers')))
@@ -1164,7 +1164,7 @@ let g:loaded_getscriptPlugin = 1
 " ------------------------------------------------------------------------------
 " Plugin lists and dein-configuration {{{
 " ------------------------------------------------------------------------------
-let s:deindir = expand(g:is_cygwin ? '~/.cache/dein_win32unix' : '~/.cache/dein')
+let s:deindir = expand('~/.cache/dein')
 let s:deinlocal = s:deindir . '/repos/github.com/Shougo/dein.vim'
 let &rtp = s:deinlocal . ',' . &rtp
 if !isdirectory(s:deinlocal)
@@ -1203,6 +1203,10 @@ if g:at_startup
   unlet s:_
 endif
 
+let s:system_name = has('win64') ? 'win64' : has('win32') ? 'win32' : g:is_cygwin ? 'win32unix' : ''
+let s:vim_name = s:is_nvim ? 'nvim' : s:is_cui ? 'vim' : 'gvim'
+let g:dein#cache_directory = expand(s:deindir . '/cache/' . s:system_name . '_' . s:vim_name)
+unlet s:system_name s:vim_name
 if dein#load_state(s:deindir)
   call dein#begin(s:deindir)
   call dein#load_toml(expand('~/.vim/dein.toml'), {'lazy': 0})
