@@ -344,6 +344,22 @@ function! vimrc#show_tab_info() abort " {{{
   endfor
 endfunction " }}}
 
+function! vimrc#show_interp_version() abort " {{{
+  let verdict = s:get_interp_version()
+  for [key, val] in map(sort(keys(verdict)), '[v:val, verdict[v:val]]')
+    if !val.has
+      continue
+    endif
+    if has_key(val, 'exception')
+      echohl Error
+      echomsg printf('%s: %s', key, val.exception)
+      echohl None
+    else
+      echomsg printf('%s: %s', key, val.version)
+    endif
+  endfor
+endfunction " }}}
+
 function! vimrc#dein_name_complete(arglead, cmdline, cursorpos) abort " {{{
   let arglead = tolower(a:arglead)
   echomsg a:arglead
@@ -853,6 +869,116 @@ endfunction " }}}
 function! s:generate_attr(synid, mode) abort " {{{
   let attrs = filter(['bold', 'italic', 'reverse', 'standout', 'underline', 'undercurl', 'strikethrough'], "synIDattr(a:synid, v:val, a:mode) is# '1'")
   return len(attrs) == 0 ? '' : (a:mode . '=' . join(attrs, ','))
+endfunction " }}}
+
+function! s:get_lua_version() abort " {{{
+  if !has('lua')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    let verstr = luaeval('_VERSION')
+    let jitver = luaeval('jit.version')
+    if type(jitver) == type('')
+      let verstr .= printf(', %s', jitver)
+    endif
+    return {'version': verstr, 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_mzscheme_version() abort " {{{
+  if !has('mzscheme')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    return {'version': mzeval('(display (version))'), 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_perl_version() abort " {{{
+  if !has('perl')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    return {'version': perleval('$^V').original, 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_python_version() abort " {{{
+  if !has('python')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    python import sys
+    return {'version': pyeval('sys.version'), 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_python3_version() abort " {{{
+  if !has('python3')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    python3 import sys
+    return {'version': py3eval('sys.version'), 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_pythonx_version() abort " {{{
+  if !has('pythonx')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    pythonx import sys
+    return {'version': pyxeval('sys.version'), 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_ruby_version() abort " {{{
+  if !has('ruby')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    return {'version': rubyeval('RUBY_VERSION'), 'has': 1}
+  catch
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_tcl_version() abort " {{{
+  if !has('tcl')
+    return {'version': '', 'has': 0}
+  endif
+  try
+    redir => tclver
+      silent tcl puts [info patchlevel]
+    redir END
+    return {'version': trim(tclver), 'has': 1}
+  catch
+    redir END
+    return {'version': '', 'has': 1, 'exception': v:exception}
+  endtry
+endfunction " }}}
+
+function! s:get_interp_version() abort " {{{
+  let verdict = {}
+  for interp in ['lua', 'mzscheme', 'perl', 'pythonx', 'python3', 'python', 'ruby', 'tcl']
+    call extend(verdict, {
+          \ interp: s:get_{interp}_version()
+          \})
+  endfor
+  return verdict
 endfunction " }}}
 
 
