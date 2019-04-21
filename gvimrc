@@ -16,17 +16,11 @@ scriptencoding utf-8
 set winaltkeys=no
 set guicursor+=a:blinkon0
 
-function! s:get_sid_prefix() abort
+function! s:get_sid_prefix() abort " {{{
   return matchstr(expand('<sfile>'), '^function \zs<SNR>\d\+_\zeget_sid_prefix$')
-endfun
+endfun " }}}
 let s:sid_prefix = s:get_sid_prefix()
 delfunction s:get_sid_prefix
-
-function! s:balloon_expr() abort " {{{
-  return vimrc#get_highlight_info_lines(v:beval_lnum, v:beval_col)
-endfunction " }}}
-let &g:balloonexpr = s:sid_prefix . 'balloon_expr()'
-set ballooneval
 
 " Change cursor color depending on state of IME.
 if has('multi_byte_ime') || has('xim')
@@ -70,15 +64,15 @@ if exists('+transparency')
   gui
   let s:transparency_pair = g:is_windows ? [[240, 210], [255, 255]] : [[15, 30], [0, 0]]
   let s:transparencies = s:transparency_pair[0]
-  function! s:toggle_transparency() abort
+  function! s:toggle_transparency() abort " {{{
     let s:transparencies = s:transparency_pair[s:transparencies is s:transparency_pair[0]]
     doautocmd FocusGained
-  endfunction
+  endfunction " }}}
   command! -bar ToggleTransparency  call s:toggle_transparency()
-  augroup MyAutoCmd
+  augroup MyAutoCmd " {{{
     autocmd FocusGained,WinEnter * let &transparency = s:transparencies[0]
     autocmd FocusLost * let &transparency = s:transparencies[1]
-  augroup END
+  augroup END " }}}
 endif
 if v:version > 704 || v:version == 704 && has('patch793')
   set belloff=all

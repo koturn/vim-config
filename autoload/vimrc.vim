@@ -316,7 +316,7 @@ endfunction " }}}
 function! vimrc#clear_undo() abort " {{{
   let save_undolevels = &l:undolevels
   setlocal undolevels=-1
-  execute "normal! a \<BS>\<Esc>"
+  execute "silent! normal! a \<BS>\<Esc>"
   setlocal nomodified
   let &l:undolevels = save_undolevels
 endfunction " }}}
@@ -470,6 +470,35 @@ else
   endfunction " }}}
   function! vimrc#term_open_existing(qmods, ...) abort " {{{
     echomsg 'terminal is not supported'
+  endfunction " }}}
+endif
+
+if executable('man')
+  function! vimrc#open_man(word) abort " {{{
+    echo 'man' string(a:word)
+    let bname = '[man ' . a:word . ']'
+    if bufexists(bname)
+      call vimrc#buf_open_existing(bname)
+      return
+    endif
+    let lines = systemlist('man ' . a:word)
+    if v:shell_error != 0
+      echohl ErrorMsg
+      for line in lines
+        echomsg line
+      endfor
+      echohl None
+    else
+      execute 'topleft new' bname
+      setfiletype man
+      call setline(1, lines)
+      call vimrc#clear_undo()
+      setlocal bufhidden=wipe buftype=nofile nobuflisted readonly
+    endif
+  endfunction " }}}
+else
+  function! vimrc#open_man(word) abort " {{{
+    echoerr 'command not found: man'
   endfunction " }}}
 endif
 

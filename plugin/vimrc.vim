@@ -51,6 +51,7 @@ else
   command! -bar -nargs=1 -complete=buffer Buffer  call vimrc#buf_open_existing(<f-args>)
 endif
 command! -bar -nargs=? -complete=customlist,vimrc#complete_term_bufname Terminal  call vimrc#term_open_existing(<q-mods>, <f-args>)
+command! -bar -count -nargs=1 KeywordprgMan  call vimrc#open_man(expand(<q-args>))
 command! -bar ShowHlGroup  call vimrc#show_highlight_info(line('.'), col('.'))
 command! -bar ShowFileSize  call vimrc#show_file_size()
 command! -bar -bang -nargs=* PluginTest  call vimrc#plugin_test(<bang>0, <q-args>, 0)

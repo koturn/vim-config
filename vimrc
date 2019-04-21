@@ -278,28 +278,8 @@ set maxfuncdepth=10000
 "   let &keywordprg = g:private.browser_cmd
 " endif
 if s:executable('man')
-  function! s:keywordprg_man(word) abort " {{{
-    let [lines, bname] = [systemlist('man ' . a:word), '[man ' . a:word . ']']
-    if v:shell_error != 0
-      echohl ErrorMsg
-      for line in lines
-        echomsg line
-      endfor
-      echohl None
-    elseif bufexists(bname)
-      call s:buf_open_existing(bname)
-    else
-      execute 'topleft new' escape(bname, '[]')
-      setfiletype man
-      call setline(1, lines)
-      call s:clear_undo()
-      setlocal bufhidden=wipe buftype=nofile nobuflisted readonly
-    endif
-  endif
-  endfunction " }}}
-  autocmd MyAutoCmd FileType c,sh,zsh  nnoremap <silent> <buffer> K  :<C-u>call <SID>keywordprg_man(expand('<cword>'))<CR>
+  autocmd MyAutoCmd FileType c,man,sh,zsh  setlocal keywordprg=:KeywordprgMan
 endif
-
 autocmd MyAutoCmd FileType help,vim  setlocal keywordprg=:help
 if s:executable('firefox')
   setglobal keywordprg=firefox\ -search
@@ -359,6 +339,18 @@ if !s:is_cui
   set guioptions=M
 endif
 
+if has('balloon_eval') || has('balloon_eval_term')
+  function! s:balloon_expr() abort " {{{
+    return vimrc#get_highlight_info_lines(v:beval_lnum, v:beval_col)
+  endfunction " }}}
+  let &g:balloonexpr = s:sid_prefix . 'balloon_expr()'
+  set ballooneval
+  if has('balloon_eval_term')
+    set balloonevalterm
+  endif
+endif
+
+
 " In windows, not to use cygwin-git.
 if g:is_windows
   let s:win_git_path = get(g:private, 'win_git_path', '')
@@ -380,10 +372,6 @@ set history=200
 set incsearch
 if has('mouse')
   set mouse=a mousemodel=popup
-endif
-if &t_Co > 2 || !s:is_cui
-  syntax enable
-  set hlsearch
 endif
 if filereadable($HOME . '/.vimrc') && filereadable($HOME . '/.ViMrC')
   setglobal tags=./tags;,tags;
@@ -843,10 +831,9 @@ augroup MyAutoCmd " {{{
   au Filetype kuin       setlocal sw=2 ts=2 sts=2 noet
   au Filetype python     setlocal sw=4 ts=8 sts=4      cindent cinkeys-=0#
   au Filetype make       setlocal sw=4 ts=4 sts=4 noet
-  au Filetype markdown   setlocal sw=4 ts=4 sts=4
+  au Filetype markdown   setlocal sw=4 ts=4 sts=4 conceallevel=0
   au Filetype tex        setlocal sw=2 ts=2 sts=2 conceallevel=0
-augroup END
-" }}}
+augroup END " }}}
 
 " ------------------------------------------------------------------------------
 " Keybinds {{{
@@ -1146,6 +1133,8 @@ inoremap <BS> <Esc>:call <SID>echo_keymsg(5)<CR>a
 " Disable default plugins {{{
 " ------------------------------------------------------------------------------
 let g:loaded_gzip = 1
+let g:loaded_logiPat = 1
+let g:loaded_rrhelper = 1
 let g:loaded_tar = 1
 let g:loaded_tarPlugin = 1
 let g:loaded_zip = 1
@@ -1256,6 +1245,10 @@ if !g:at_startup
 endif
 filetype plugin indent on
 set background=dark
+if &t_Co > 2 || !s:is_cui
+  syntax enable
+  set hlsearch
+endif
 if !s:is_cui || &t_Co == 256
   function! s:customize_iceberg() abort " {{{
     hi! Function ctermfg=216 guifg=#e2a478
@@ -1267,6 +1260,5 @@ if !s:is_cui || &t_Co == 256
 else
   colorscheme default
 endif
-set hlsearch
 set secure
 " }}}
