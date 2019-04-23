@@ -1,8 +1,4 @@
 [[plugins]]
-repo = 'haya14busa/dein-command.vim'
-on_cmd = 'Dein'
-
-[[plugins]]
 repo = 'Shougo/defx.nvim'
 depends = ['nvim-yarp', 'vim-hug-neovim-rpc']
 on_cmd = 'Defx'
@@ -36,9 +32,12 @@ autocmd MyAutoCmd FileType defx  call s:defx_my_settings()
 '''
 
 [[plugins]]
+repo = 'Shougo/denite.nvim'
+on_cmd = ['Denite', 'DeniteBufferDir', 'DeniteCursorWord']
+
+[[plugins]]
 repo = 'Shougo/deoplete.nvim'
 depends = ['nvim-yarp', 'vim-hug-neovim-rpc']
-# if = "has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704"
 if = "has('python3') && (has('nvim') || v:version >= 704)"
 on_event = ['InsertEnter', 'FocusLost', 'CursorHold']
 hook_add = '''
@@ -47,8 +46,7 @@ let g:deoplete#enable_at_startup = 1
 
 [[plugins]]
 repo = 'Shougo/neocomplete.vim'
-# if = "!(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))"
-if = 0
+if = "!has('nvim') && !has('python3') && has('lua') && (v:version > 703 || v:version == 703 && has('patch885'))"
 on_cmd = ['NeoCompleteEnable', 'NeoCompleteDisable', 'NeoCompleteLock', 'NeoCompleteUnlock', 'NeoCompleteToggle', 'NeoCompleteSetFileType', 'NeoCompleteClean', 'NeoCompleteBufferMakeCache', 'NeoCompleteDictionaryMakeCache', 'NeoCompleteSyntaxMakeCache', 'NeoCompleteTagMakeCache']
 on_event = 'InsertEnter'
 hook_add = '''
@@ -63,10 +61,9 @@ let g:neocomplete#sources#dictionary#dictionaries = {
 
 [[plugins]]
 repo = 'Shougo/neocomplcache'
-# if = "!(has('nvim') || !has('win32') && !has('win32unix') && v:version >= 704) && !(has('lua') && (v:version > 703 || (v:version == 703 && has('patch885'))))"
-if = 0
+if = "!has('python3') && !has('lua') && !(v:version > 703 || v:version == 703 && has('patch885'))"
 on_event = 'InsertEnter'
-on_cmd' = [
+on_cmd = [
   'NeoComplCacheEnable',
   'NeoComplCacheDisable',
   'NeoComplCacheLock',
@@ -119,10 +116,6 @@ endif
 '''
 
 [[plugins]]
-repo = 'Shougo/denite.nvim'
-on_cmd = ['Denite', 'DeniteBufferDir', 'DeniteCursorWord']
-
-[[plugins]]
 repo = 'Shougo/unite.vim'
 on_cmd = ['Unite', 'UniteWithCurrentDir', 'UniteWithBufferDir', 'UniteWithProjectDir', 'UniteWithInputDirectory', 'UniteWithCursorWord', 'UniteWithInput', 'UniteResume', 'UniteClose', 'UniteNext', 'UnitePrevious', 'UniteFirst', 'UniteLast']
 hook_add = '''
@@ -161,43 +154,13 @@ nnoremap [unite]M   :<C-u>Unite mplayer
 '''
 
 [[plugins]]
-repo = 'ctrlpvim/ctrlp.vim'
-on_cmd = ['CtrlP', 'CtrlPMRUFiles', 'CtrlPBuffer', 'CtrlPLastMode', 'CtrlPClearCache', 'CtrlPClearAllCaches', 'CtrlPCtrlPCache', 'CtrlPAllCtrlPCaches', 'CtrlPCurWD', 'CtrlPCurFile', 'CtrlPRoot', 'CtrlPTag', 'CtrlPQuickfix', 'CtrlPDir', 'CtrlPBufTag', 'CtrlPBufTagAll', 'CtrlPRTS', 'CtrlPUndo', 'CtrlPLine', 'CtrlPChange', 'CtrlPChangeAll', 'CtrlPMixed', 'CtrlPBookmarkDir', 'CtrlPBookmarkDirAdd']
-hook_add = '''
-let g:ctrlp_path_nolim = 1
-let g:ctrlp_key_loop = 1
-let g:ctrlp_extensions = [
-      \ 'mplayer',
-      \ 'rebuildfm',
-      \ 'mozaicfm',
-      \ 'nicovideo',
-      \ 'kotemplate'
-      \]
-" if executable('ag')
-"   let g:ctrlp_use_caching = 0
-"   let g:ctrlp_user_command = 'ag %s -iS0 --nocolor --nogroup --nobreak -g ""'
-" endif
-nnoremap [ctrlp] <Nop>
-nmap <C-p>  [ctrlp]
-nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
-nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
-'''
-hook_post_source = '''
-nmap <C-p>  [ctrlp]
-'''
-
-[[plugins]]
-repo = 'LeafCage/alti.vim'
-on_func = 'alti'
-
-[[plugins]]
 repo = 'Shougo/vimfiler'
 depends = 'unite.vim'
 on_cmd = ['VimFiler', 'VimFilerDouble', 'VimFilerCurrentDir', 'VimFilerBufferDir', 'VimFilerCreate', 'VimFilerSimple', 'VimFilerSplit', 'VimFilerTab', 'VimFilerExplorer', 'VimFilerClose', 'VimFilerEdit', 'VimFilerRead', 'VimFilerSource', 'VimFilerWrite']
 
 [[plugins]]
 repo = 'Shougo/vimproc.vim'
-build = "make CFLAGS='' -Ofast -march=native -flto -s -Wall -Wextra -Wno-unused -Wno-unused-parameter -use=gnu99 -shared"
+hook_post_update = "make CFLAGS='-Ofast -march=native -flto -s -Wall -Wextra -Wno-unused -Wno-unused-parameter -use=gnu99 -Wl,-O1 -shared'"
 on_cmd = ['VimProcInstall', 'VimProcBang', 'VimProcRead']
 on_func = 'vimproc'
 
@@ -242,6 +205,11 @@ repo = 'Shougo/vinarise'
 on_cmd = ['Vinarise', 'VinarisePluginBitmapView', 'VinarisePluginDump']
 
 [[plugins]]
+repo = 'aiya000/aref-web.vim'
+on_cmd = ['Aref', 'ArefOpenBrowser']
+on_map = [['n', '<Plug>(aref_web_show_']]
+
+[[plugins]]
 repo = 'AndrewRadev/switch.vim'
 on_cmd = 'Switch'
 hook_add = 'nnoremap <silent> <Space>!  :<C-u>Switch<CR>'
@@ -249,6 +217,10 @@ hook_source = '''
 call pluginconfig#switch()
 delfunction pluginconfig#switch
 '''
+
+[[plugins]]
+repo = 'LeafCage/alti.vim'
+on_func = 'alti'
 
 [[plugins]]
 repo = 'LeafCage/vimhelpgenerator'
@@ -274,12 +246,8 @@ let g:tweetvim_original_hi = 1
 let g:tweetvim_tweet_per_page = 50
 let g:tweetvim_display_source = 1
 let g:tweetvim_display_time = 1
-" let g:tweetvim_display_icon = 1
-
 nnoremap [tweetvim] <Nop>
 nmap ,t  [tweetvim]
-" nnoremap [ref]t
-"       \ :<C-u>call tmpwin#toggle(['normal! gg', 'setl nohidden'], 'TweetVimHomeTimeline')<CR>
 nnoremap [tweetvim]tc  :<C-u>call tweetvim#say#current_line()<CR>
 nnoremap [tweetvim]ts  :<C-u>call tweetvim#say#open_with_account()<CR>
 nnoremap [tweetvim]th  :<C-u>call tmpwin#toggle('TweetVimHomeTimeline')<CR>
@@ -305,6 +273,32 @@ nnoremap <silent> <C-w><Leader> :<C-u>TmuxNavigatePrevious<CR>
 [[plugins]]
 repo = 'cohama/agit.vim'
 on_cmd = ['Agit', 'AgitFile']
+
+[[plugins]]
+repo = 'ctrlpvim/ctrlp.vim'
+on_cmd = ['CtrlP', 'CtrlPMRUFiles', 'CtrlPBuffer', 'CtrlPLastMode', 'CtrlPClearCache', 'CtrlPClearAllCaches', 'CtrlPCtrlPCache', 'CtrlPAllCtrlPCaches', 'CtrlPCurWD', 'CtrlPCurFile', 'CtrlPRoot', 'CtrlPTag', 'CtrlPQuickfix', 'CtrlPDir', 'CtrlPBufTag', 'CtrlPBufTagAll', 'CtrlPRTS', 'CtrlPUndo', 'CtrlPLine', 'CtrlPChange', 'CtrlPChangeAll', 'CtrlPMixed', 'CtrlPBookmarkDir', 'CtrlPBookmarkDirAdd']
+hook_add = '''
+let g:ctrlp_path_nolim = 1
+let g:ctrlp_key_loop = 1
+let g:ctrlp_extensions = [
+      \ 'mplayer',
+      \ 'rebuildfm',
+      \ 'mozaicfm',
+      \ 'nicovideo',
+      \ 'kotemplate'
+      \]
+" if executable('ag')
+"   let g:ctrlp_use_caching = 0
+"   let g:ctrlp_user_command = 'ag %s -iS0 --nocolor --nogroup --nobreak -g ""'
+" endif
+
+let g:ctrlp_map = '[ctrlp]p'
+nnoremap [ctrlp] <Nop>
+nmap <C-p>  [ctrlp]
+nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
+nnoremap <silent> [ctrlp]k  :<C-u>CtrlPKoTemplate<CR>
+nnoremap <silent> [ctrlp]m  :<C-u>CtrlPMPlayer<CR>
+'''
 
 [[plugins]]
 repo = 'daisuzu/facebook.vim'
@@ -352,6 +346,10 @@ hook_add = 'command! -nargs=0 MemoList  silent call memolist#list() | call memol
 [[plugins]]
 repo = 'gregsexton/VimCalc'
 on_cmd = 'Calc'
+
+[[plugins]]
+repo = 'haya14busa/dein-command.vim'
+on_cmd = 'Dein'
 
 [[plugins]]
 repo = 'haya14busa/vim-textobj-number'
@@ -467,10 +465,6 @@ repo = 'koturn/benchvimrc-vim'
 on_cmd = 'BenchVimrc'
 
 [[plugins]]
-repo = 'koturn/vim-atcoder'
-on_cmd = 'AtCoderSubmit'
-
-[[plugins]]
 repo = 'koturn/vim-brainfuck'
 on_cmd = ['BFExecute', 'BFTranslate2C']
 on_ft = 'brainfuck'
@@ -562,7 +556,7 @@ let g:kotemplate#enable_autocmd = 1
 let g:kotemplate#auto_filetypes = keys(g:kotemplate#filter.pattern)
 " let g:kotemplate#autocmd_function = 'unite'
 let g:kotemplate#autocmd_function = 'ctrlp'
-let g:kotemplate#dir = '~/github/kotemplate/'
+let g:kotemplate#dir = '~/github/kotemplate/templates/'
 let g:kotemplate#tag_actions = [{
       \ '<+AUTHOR+>': 'koturn',
       \ '<+MAIL_ADDRESS+>': get(g:private, 'gmail_address', ''),
@@ -690,11 +684,7 @@ repo = 'koturn/vim-rebuildfm'
 depends = 'vim-mplayer'
 on_cmd = ['CtrlPRebuildfm', 'RebuildfmPlayByNumber', 'RebuildfmLiveStream', 'RebuildfmStop', 'RebuildfmTogglePause', 'RebuildfmToggleMute', 'RebuildfmVolume', 'RebuildfmSpeed', 'RebuildfmSeek', 'RebuildfmRelSeek', 'RebuildfmShowInfo', 'RebuildfmUpdateChannel']
 on_source = 'unite.vim'
-hook_add = '''
-" call dein#source('vim-mplayer')
-" let rebuildfm#play_command = g:mplayer#mplayer
-let rebuildfm#verbose = 1
-'''
+hook_add = 'let rebuildfm#verbose = 1'
 
 [[plugins]]
 repo = 'koturn/vim-replica'
@@ -744,11 +734,6 @@ on_map = [['xo', 'a_'], ['xo', 'i_']]
 [[plugins]]
 repo = 'majutsushi/tagbar'
 on_cmd = ['Tagbar', 'TagbarToggle', 'TagbarOpen', 'TagbarOpenAutoClose', 'TagbarClose', 'TagbarSetFoldlevel', 'TagbarShowTag', 'TagbarCurrentTag', 'TagbarGetTypeConfig', 'TagbarDebug', 'TagbarDebugEnd', 'TagbarTogglePause']
-
-[[plugins]]
-repo = 'mattn/ctrlp-jazzradio'
-depends = 'ctrlp.vim'
-on_cmd = 'CtrlPJazzradio'
 
 [[plugins]]
 repo = 'mattn/ctrlp-launcher'
@@ -1242,3 +1227,15 @@ map! <C-ScrollWheelDown>  <Plug>(fontzoom-smaller)
 repo = 'koturn/vim-kolor'
 on_cmd = ['KolorShowPalette256', 'KolorEcho', 'KolorEchoNr']
 on_func = 'kolor'
+
+
+[[plugins]]
+repo = 'easymotion/vim-easymotion'
+on_cmd = ['EMCommandLineNoreMap', 'EMCommandLineMap', 'EMCommandLineUnMap']
+on_func = 'EasyMotion'
+on_map = [['nov', '<Plug>(easymotion-']]
+hook_add = '''
+" let g:EasyMotion_do_mapping = 0
+nmap <Leader>f <plug>(easymotion-overwin-f2)
+let g:EasyMotion_smartcase = 1
+'''

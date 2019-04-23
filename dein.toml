@@ -9,12 +9,10 @@ repo = 'neovim/pynvim'
 
 [[plugins]]
 repo = 'roxma/nvim-yarp'
-if = "!has('nvim')"
 on_func = 'yarp'
 
 [[plugins]]
 repo = 'roxma/vim-hug-neovim-rpc'
-if = "!has('nvim')"
 on_func = 'neovim_rpc'
 
 [[plugins]]
