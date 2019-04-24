@@ -1201,6 +1201,15 @@ if dein#load_state(s:deindir)
   call dein#load_toml(expand('~/.vim/dein.toml'), {'lazy': 0})
   call dein#load_toml(expand('~/.vim/dein_lazy.toml'), {'lazy': 1})
   call dein#end()
+  let s:on_source_action = "echomsg 'sourced' g:dein#plugin.name"
+  for s:plugin in values(dein#get())
+    if has_key(s:plugin, 'hook_source')
+      let s:plugin.hook_source .= "\n" . s:on_source_action
+    else
+      let s:plugin.hook_source = s:on_source_action
+    endif
+  endfor
+  unlet s:on_source_action s:plugin
   call dein#save_state()
 endif
 
