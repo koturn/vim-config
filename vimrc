@@ -783,8 +783,7 @@ function! s:matchadd(group, pattern, ...) abort " {{{
   call call('matchadd', extend([a:group, a:pattern], a:000))
 endfunction " }}}
 function! s:matchdelete(groups) abort " {{{
-  let groups = type(a:groups) == type('') ? [a:groups] : a:groups
-  for group in groups
+  for group in type(a:groups) == type('') ? [a:groups] : a:groups
     let matches = getmatches()
     let idx = index(map(copy(matches), 'v:val.group'), group)
     if idx != -1
@@ -793,24 +792,20 @@ function! s:matchdelete(groups) abort " {{{
   endfor
 endfunction " }}}
 
-augroup MyAutoCmd " {{{
+augroup MyHighlight " {{{
   au ColorScheme * hi WhitespaceEOL term=underline ctermbg=Blue guibg=Blue
-  au VimEnter,WinEnter,BufRead * call s:matchadd('WhitespaceEOL', ' \+$')
-  " au VimEnter,WinEnter,BufRead * match WhitespaceEOL / \+$/
+  au VimEnter,BufRead * call s:matchadd('WhitespaceEOL', ' \+$') | au MyHighlight WinEnter <buffer> call s:matchadd('WhitespaceEOL', ' \+$')
 
   au ColorScheme * hi TabEOL term=underline ctermbg=DarkGreen guibg=DarkGreen
-  au VimEnter,WinEnter,BufRead * call s:matchadd('TabEOL', '\t\+$')
-  " au VimEnter,WinEnter,BufRead * match TabEOL /\t\+$/
+  au VimEnter,BufRead * call s:matchadd('TabEOL', '\t\+$') | au MyHighlight WinEnter <buffer> call s:matchadd('TabEOL', '\t\+$')
 
   au ColorScheme * hi SpaceTab term=underline ctermbg=Magenta guibg=Magenta guisp=Magenta
-  au VimEnter,WinEnter,BufRead * call s:matchadd('SpaceTab', ' \+\ze\t\|\t\+\ze ')
-  " au VimEnter,WinEnter,BufRead * match SpaceTab / \+\ze\t\|\t\+\ze /
+  au VimEnter,BufRead * call s:matchadd('SpaceTab', ' \+\ze\t\|\t\+\ze ') | au MyHighlight WinEnter <buffer> call s:matchadd('SpaceTab', ' \+\ze\t\|\t\+\ze ')
 
-  au Colorscheme * hi JPSpace term=underline ctermbg=Red guibg=Red
+  au Colorscheme * hi link JPSpace Error
   au VimEnter,WinEnter,BufRead * call s:matchadd('JPSpace', '　')  " \%u3000
-  " au VimEnter,WinEnter,BufRead * match JPSpace /　/
 
-  au Filetype {help,vimshell,presen,rogue,showtime} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab'])
+  au Filetype {defx,help,vimshell,presen,rogue,showtime,vimcastle} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab']) | au! MyHighlight WinEnter <buffer>
 augroup END " }}}
 " }}}
 
@@ -951,7 +946,9 @@ else
 endif
 nnoremap <expr> @  vimrc#hint_cmd_output('@', 'registers')
 
-au MyAutoCmd Filetype html nnoremap <buffer> <F5>  :<C-u>lcd %:h<CR>:<C-u>silent !start cmd /c call chrome %<CR>
+if g:is_windows
+  au MyAutoCmd Filetype html nnoremap <buffer> <F5>  :<C-u>lcd %:h<CR>:<C-u>silent !start cmd /c call chrome %<CR>
+endif
 
 inoremap <C-c>  <C-c>u
 " Move to indented position.
@@ -1116,14 +1113,14 @@ endif
 " Disable delete with <Delete>
 noremap  <Del> <Nop>
 noremap! <Del> <Nop>
-nnoremap <Del> :<C-u>call <SID>echo_keymsg(4)<CR>
-inoremap <Del> <Esc>:call <SID>echo_keymsg(4)<CR>a
+nnoremap <Del> :<C-u>call vimrc#echo_keymsg(4)<CR>
+inoremap <Del> <Esc>:call vimrc#echo_keymsg(4)<CR>a
 " Disable delete with <BS>.
 " But available in command-line mode.
 noremap  <BS> <Nop>
 inoremap <BS> <Nop>
-nnoremap <BS> :<C-u>call <SID>echo_keymsg(5)<CR>
-inoremap <BS> <Esc>:call <SID>echo_keymsg(5)<CR>a
+nnoremap <BS> :<C-u>call vimrc#echo_keymsg(5)<CR>
+inoremap <BS> <Esc>:call vimrc#echo_keymsg(5)<CR>a
 " }}}
 
 " ------------------------------------------------------------------------------

@@ -779,7 +779,7 @@ function! vimrc#range_search(d) abort " {{{
   endif
 endfunction " }}}
 
-function! s:echo_keymsg(msgnr) abort " {{{
+function! vimrc#echo_keymsg(msgnr) abort " {{{
   echo s:keymsgs[a:msgnr]
 endfunction " }}}
 
