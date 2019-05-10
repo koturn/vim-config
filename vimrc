@@ -388,22 +388,29 @@ if g:is_mac
 endif
 
 " ------------------------------------------------------------------------------
-" CLPUM patch {{{
+" Configuration for custom patches {{{
 " ------------------------------------------------------------------------------
 if has('clpum')
   set wildmenu wildmode=longest,popup
   set clpumheight=40
   autocmd MyAutoCmd ColorScheme * highlight! link ClPmenu Pmenu
-  " function! s:clpum_complete(findstart, base) abort
-  "   return a:findstart ? getcmdpos() : [
-  "         \ {'word': 'Jan', 'menu': 'January'},
-  "         \ {'word': 'Feb', 'menu': 'February'},
-  "         \ {'word': 'Mar', 'menu': 'March'},
-  "         \ {'word': 'Apr', 'menu': 'April'},
-  "         \ {'word': 'May', 'menu': 'May'},
-  "         \]
-  " endfunction
-  " let &clcompletefunc = s:sid_prefix . 's:clpum_complete'
+endif
+
+if has('tabsidebar')
+  function! s:tabsidebar() abort
+    try
+      return join([printf('TabPage:%d', g:actual_curtabpage)] + map(
+            \ filter(getwininfo(), 'v:val.tabnr == g:actual_curtabpage'),
+            \ "printf('  %s', v:val.terminal ? '[Terminal]' : v:val.quickfix ? '[QuickFix]' : v:val.loclist ? '[LocList]' : fnamemodify(bufname(v:val.bufnr), ':t'))"), "\n")
+    catch
+      return string(v:exception)
+    endtry
+  endfunction
+  set showtabsidebar=1
+  set tabsidebarcolumns=20
+  set tabsidebarwrap
+  execute 'set tabsidebar=%!' . s:sid_prefix . 'tabsidebar()'
+  nnoremap <silent> <Space>t  :<C-u>let &showtabsidebar = &showtabsidebar ? 0 : 1<CR>
 endif
 " }}}
 " }}}
