@@ -782,6 +782,16 @@ function! vimrc#echo_keymsg(msgnr) abort " {{{
   echo s:keymsgs[a:msgnr]
 endfunction " }}}
 
+function! vimrc#dein_install(install_dir) abort " {{{
+  if !s:check_dein_requirements()
+    return
+  endif
+  call mkdir(a:install_dir, 'p')
+  call s:system('git clone https://github.com/Shougo/dein.vim.git ' . a:install_dir)
+  source $MYVIMRC
+  call dein#install()
+endfunction " }}}
+
 
 function! s:redir(cmd) abort " {{{
   let [verbose, verbosefile] = [&verbose, &verbosefile]
@@ -980,6 +990,19 @@ function! s:get_interp_version() abort " {{{
   return verdict
 endfunction " }}}
 
+function! s:check_dein_requirements() abort " {{{
+  if !s:is_nvim && v:version < 800
+    echoerr 'Please use Vim 8.0 or above or NeoVim!'
+    return 0
+  elseif !s:executable('git')
+    echoerr 'Please install git!'
+    return 0
+  elseif !s:executable('rsync')
+    echoerr 'Please install rsync!'
+    return 0
+  endif
+  return 1
+endfunction " }}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

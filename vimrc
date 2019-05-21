@@ -74,8 +74,8 @@ endif
 augroup MyAutoCmd " {{{
   autocmd!
 augroup END " }}}
-" Measure startup time.
-if g:at_startup && has('reltime')
+
+if has('reltime') && g:at_startup
   autocmd MyAutoCmd VimEnter *
         \   redraw
         \ | echomsg 'startuptime:' reltimestr(reltime(s:startuptime))
@@ -498,7 +498,7 @@ function! s:add_dictionary() abort " {{{
   let &l:dictionary .= ','
   execute 'setlocal dictionary+=' . s:dict_base_dir . &filetype . '.txt'
 endfunction " }}}
-autocmd MyAutoCmd Filetype *  call s:add_dictionary()
+autocmd MyAutoCmd FileType *  call s:add_dictionary()
 " }}}
 
 " ------------------------------------------------------------------------------
@@ -538,15 +538,13 @@ autocmd MyAutoCmd FileType c,cpp
       \ command! -bar -bang -range=% -buffer FormatCProgram
       \ <line1>,<line2>call vimrc#format_c_program(<bang>0)
 
-
-function! Tapi_Drop(bufnum, arglist) abort " {{{
-  let [pwd, argv] = [a:arglist[0] . '/', a:arglist[1 :]]
-  for arg in map(argv, 'pwd . v:val')
-    execute 'drop ' . fnameescape(arg)
-  endfor
-endfunction " }}}
-
 if exists('#TerminalOpen')
+  function! Tapi_Drop(bufnum, arglist) abort " {{{
+    let [pwd, argv] = [a:arglist[0] . '/', a:arglist[1 :]]
+    for arg in map(argv, 'pwd . v:val')
+      execute 'drop ' . fnameescape(arg)
+    endfor
+  endfunction " }}}
   autocmd MyAutoCmd TerminalOpen *bash*,*zsh* call term_sendkeys(bufnr('%'), join([
         \ 'function vimterm_quote_args() { for a in "$@"; do echo ", \"$a\""; done; }',
         \ 'function vimterm_drop() { echo -e "\e]51;[\"call\", \"Tapi_Drop\", [\"$PWD\" `vimterm_quote_args "$@"`]]\x07"; }',
@@ -598,9 +596,9 @@ xnoremap ,g  :<C-u>call vimrc#store_selected_text()<CR>:<C-u>vimgrep/<C-r>"/ **/
 
 nnoremap <silent> <M-p>  :<C-u>call vimrc#complete_xml_tag()<CR>
 inoremap <silent> <M-p>  <Esc>:call vimrc#complete_xml_tag()<CR>
-autocmd MyAutoCmd Filetype ant,html,xml  inoremap <buffer> </     </<C-x><C-o>
-autocmd MyAutoCmd Filetype ant,html,xml  inoremap <buffer> <M-a>  </<C-x><C-o>
-autocmd MyAutoCmd Filetype ant,html,xml  inoremap <buffer> <M-i>  </<C-x><C-o><Esc>%i
+autocmd MyAutoCmd FileType ant,html,xml  inoremap <buffer> </     </<C-x><C-o>
+autocmd MyAutoCmd FileType ant,html,xml  inoremap <buffer> <M-a>  </<C-x><C-o>
+autocmd MyAutoCmd FileType ant,html,xml  inoremap <buffer> <M-i>  </<C-x><C-o><Esc>%i
 
 " Highlight cursor position vertically and horizontally.
 command! -bar ToggleCursorHighlight
@@ -613,8 +611,8 @@ nnoremap <silent> <Leader>h  :<C-u>ToggleCursorHighlight<CR>
 autocmd MyAutoCmd CursorHold,CursorHoldI,WinEnter *  set cursorline cursorcolumn
 autocmd MyAutoCmd CursorMoved,CursorMovedI,WinLeave *  set nocursorline nocursorcolumn
 
-vnoremap <silent>/  :<C-u>call vimrc#range_search('/')<CR>
-vnoremap <silent>?  :<C-u>call vimrc#range_search('?')<CR>
+vnoremap <silent> /  :<C-u>call vimrc#range_search('/')<CR>
+vnoremap <silent> ?  :<C-u>call vimrc#range_search('?')<CR>
 
 command! -count=1 -nargs=0 GoToTheLine  silent execute getpos('.')[1][: -len(v:count) - 1] . v:count
 nnoremap <silent> gl  :<C-u>GoToTheLine<CR>
@@ -645,117 +643,6 @@ command! -bar TabNew  tabnew | setlocal nobuflisted bufhidden=unload buftype=nof
 command! -bar -nargs=1 -complete=file E  tabedit <args>
 command! -bar Q  tabclose <args>
 command! -bar GC  call garbagecollect()
-
-" {{{ VimLint
-" http://kannokanno.hatenablog.com/entry/20120726/1343321506
-function! s:vimlint(file) abort " {{{
-  unlet! g:__func_lnums__
-  try
-    call setqflist(s:vimlint_qflist(a:file), 'r')
-    cwindow
-    silent! doautocmd QuickFixCmdPost make
-  finally
-    unlet! g:__func_lnums__
-  endtry
-endfunction " }}}
-
-function! s:vimlint_qflist(file) abort " {{{
-  let srclines = readfile(a:file, 'b')
-  let qflist = []
-  let start_pos = 0
-  let relative_num = 0
-  for l in s:vimlint_source(s:vimlint_hook_file(srclines))
-    " ex) function <SNR>175_hoge の処理中にエラーが検出されました:
-    if l =~ '^function'
-      let start_pos = s:vimlint_func_define_linenum(srclines, l)
-    "ex) 行    1:
-    elseif l =~ '^\%(line\|行\)'
-      let relative_num = matchstr(l, '\%(line\|行\)\s*\zs\d*\ze')
-    "ex) E492: エディタのコマンドではありません:   et s:str = ''
-    elseif l =~ '^E'
-      call add(qflist, {
-            \ 'filename': a:file,
-            \ 'lnum': start_pos + relative_num,
-            \ 'text': l
-            \})
-      let [start_pos, relative_num] = [0, 0]
-    endif
-  endfor
-  return qflist
-endfunction " }}}
-
-function! s:vimlint_hook_file(srclines) abort " {{{
-  let tempfile = tempname()
-  call writefile(extend(a:srclines, s:vimlint_hook_lines()), tempfile, 'b')
-  return tempfile
-endfunction " }}}
-
-function! s:vimlint_source(file) abort " {{{
-  let tempfile = tempname()
-  let save_verbosefile = &verbosefile
-  let &verbosefile = tempfile
-  try
-    silent! execute 'source' a:file
-  finally
-    if &verbosefile ==# tempfile
-      let &verbosefile = save_verbosefile
-    endif
-  endtry
-  let messages = ''
-  if filereadable(tempfile)
-    let messages .= join(readfile(tempfile, 'b'), "\n")
-    call delete(tempfile)
-  endif
-  return split(messages, "\n")
-endfunction " }}}
-
-function! s:vimlint_func_define_linenum(srclines, line) abort " {{{
-  let funcname = a:line =~# '<SNR>' ? matchstr(a:line, '<SNR>\d*_\zs.*\ze\s') : matchstr(a:line, 'function\s\zs\d*\ze\s')
-  return exists('g:__func_lnums__') ? get(g:__func_lnums__, funcname, 0) : 0
-endfunction " }}}
-
-function! s:vimlint_hook_lines() abort " {{{
-  return [
-        \ 'function! s:vimlint_func_lnums(file) abort',
-        \ '  let func_lnum = {}',
-        \ '  let lines = readfile(a:file)',
-        \ '  for i in range(0, len(lines)-1)',
-        \ '    let l = lines[i]',
-        \ '    let func_define = s:vimlint_func_define_line(matchstr(l, ''function!\s*\zs.*\ze(''))',
-        \ '    if !empty(func_define)',
-        \ '      let simplename = func_define =~ ''<SNR>''',
-        \ '            \ ? matchstr(func_define, ''<SNR>\d*_\zs.*\ze('')',
-        \ '            \ : matchstr(func_define, ''.*\s\zs\d*\ze('')',
-        \ '      if !empty(simplename)',
-        \ '        let func_lnum[simplename] = i + 1',
-        \ '      endif',
-        \ '    endif',
-        \ '  endfor',
-        \ '  return func_lnum',
-        \ 'endfunction',
-        \ 'function! s:vimlint_func_define_line(funcname) abort',
-        \ '  let tempfile = tempname()',
-        \ '  let save_verbosefile = &verbosefile',
-        \ '  let &verbosefile = tempfile',
-        \ '  try',
-        \ '    silent! execute ''function '' . a:funcname',
-        \ '  finally',
-        \ '    if &verbosefile ==# tempfile',
-        \ '      let &verbosefile = save_verbosefile',
-        \ '    endif',
-        \ '  endtry',
-        \ '  let messages = ''''',
-        \ '  if filereadable(tempfile)',
-        \ '    let messages .= join(readfile(tempfile, ''b''), "\n")',
-        \ '    call delete(tempfile)',
-        \ '  endif',
-        \ '  return split(messages, "\n")[0]',
-        \ 'endfunction',
-        \ 'let g:__func_lnums__ = s:vimlint_func_lnums(expand("%"))'
-        \]
-endfunction " }}}
-command! -bar -nargs=1 VimLint  call s:vimlint(expand(<q-args>))
-" }}}
 " }}}
 
 " ------------------------------------------------------------------------------
@@ -812,7 +699,7 @@ augroup MyHighlight " {{{
   au Colorscheme * hi link JPSpace Error
   au VimEnter,WinEnter,BufRead * call s:matchadd('JPSpace', '　')  " \%u3000
 
-  au Filetype {defx,help,vimshell,presen,rogue,showtime,vimcastle} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab']) | au! MyHighlight WinEnter <buffer>
+  au FileType {defx,help,vimshell,presen,rogue,showtime,vimcastle} call s:matchdelete(['WhitespaceEOL', 'TabEOL', 'SpaceTab']) | au! MyHighlight WinEnter <buffer>
 augroup END " }}}
 " }}}
 
@@ -821,20 +708,20 @@ augroup END " }}}
 " ------------------------------------------------------------------------------
 let g:c_gnu = 1  " Enable highlight gnu-C keyword in C-mode.
 augroup MyAutoCmd " {{{
-  au Filetype awk        setlocal                      cindent cinkeys-=0#
-  au Filetype c          setlocal                      cindent cinoptions& cinoptions+=g0,l0,N-s,t0 cinkeys-=0#
-  au Filetype cpp        setlocal                      cindent cinoptions& cinoptions+=g0,j1,l0,N-s,t0,ws,Ws,(0 cinkeys-=0#
+  au FileType awk           setlocal                      cindent cinkeys-=0#
+  au FileType c             setlocal                      cindent cinoptions& cinoptions+=g0,l0,N-s,t0 cinkeys-=0#
+  au FileType cpp           setlocal                      cindent cinoptions& cinoptions+=g0,j1,l0,N-s,t0,ws,Ws,(0 cinkeys-=0#
   " )
-  au Filetype cs         setlocal sw=4 ts=4 sts=4 noet
-  au Filetype java       setlocal sw=4 ts=4 sts=4 noet cindent cinoptions& cinoptions+=j1
-  au Filetype javascript setlocal sw=2 ts=2 sts=2      cindent cinoptions& cinoptions+=j1,J1,(s
+  au FileType cs            setlocal sw=4 ts=4 sts=4 noet foldmethod=syntax
+  au FileType java          setlocal sw=4 ts=4 sts=4 noet cindent cinoptions& cinoptions+=j1
+  au FileType javascript    setlocal sw=2 ts=2 sts=2      cindent cinoptions& cinoptions+=j1,J1,(s
   " )
-  au Filetype make       setlocal sw=4 ts=4 sts=4
-  au Filetype kuin       setlocal sw=2 ts=2 sts=2 noet
-  au Filetype python     setlocal sw=4 ts=8 sts=4      cindent cinkeys-=0#
-  au Filetype make       setlocal sw=4 ts=4 sts=4 noet
-  au Filetype markdown   setlocal sw=4 ts=4 sts=4 conceallevel=0
-  au Filetype tex        setlocal sw=2 ts=2 sts=2 conceallevel=0
+  au FileType make          setlocal sw=4 ts=4 sts=4
+  au FileType kuin          setlocal sw=2 ts=2 sts=2 noet
+  au FileType python        setlocal sw=4 ts=8 sts=4      cindent cinkeys-=0#
+  au FileType make          setlocal sw=4 ts=4 sts=4 noet
+  au FileType markdown      setlocal sw=4 ts=4 sts=4 conceallevel=0
+  au FileType plaintex,tex  setlocal sw=2 ts=2 sts=2 conceallevel=0
 augroup END " }}}
 
 " ------------------------------------------------------------------------------
@@ -1149,35 +1036,19 @@ let g:loaded_vimball = 1
 let g:loaded_vimballPlugin = 1
 let g:loaded_getscript = 1
 let g:loaded_getscriptPlugin = 1
-" let g:loaded_netrw = 1
-" let g:loaded_netrwPlugin = 1
-" let g:loaded_netrwSettings = 1
-" let g:loaded_netrwFileHandlers = 1
+let g:loaded_netrw = 1
+let g:loaded_netrwPlugin = 1
+let g:loaded_netrwSettings = 1
+let g:loaded_netrwFileHandlers = 1
 " }}}
 " ------------------------------------------------------------------------------
 " Plugin lists and dein-configuration {{{
 " ------------------------------------------------------------------------------
 let s:deindir = expand('~/.cache/dein')
-let s:deinlocal = s:deindir . '/repos/github.com/Shougo/dein.vim'
-let &rtp = s:deinlocal . ',' . &rtp
-if !isdirectory(s:deinlocal)
-  if v:version < 703
-    echoerr 'Please use Vim 7.4!!!'
-    finish
-  elseif !s:executable('git')
-    echoerr 'Please install git!!!'
-    finish
-  elseif !s:executable('rsync')
-    echoerr 'Please install rsync!!!'
-    finish
-  endif
-  function! s:dein_init() abort " {{{
-    call mkdir(s:deinlocal, 'p')
-    call s:system('git clone https://github.com/Shougo/dein.vim.git ' . s:deinlocal)
-    source $MYVIMRC
-    call dein#install()
-  endfunction " }}}
-  command! -bar DeinInit  call s:dein_init()
+let s:dein_install_dir = s:deindir . '/repos/github.com/Shougo/dein.vim'
+let &rtp = s:dein_install_dir . ',' . &rtp
+if !isdirectory(s:dein_install_dir)
+  command! -bar DeinInit  call vimrc#dein_install(s:dein_install_dir)
   echomsg 'Please Install dein.vim!'
   echomsg 'Do command :DeinInit'
   colorscheme default
