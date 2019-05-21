@@ -634,12 +634,11 @@ if executable('jq')
   endfunction " }}}
 else
   function! vimrc#jq(has_bang, ...) abort range " {{{
-    echoerr 'command not found:' a:file
+    echoerr 'command not found: jq'
   endfunction " }}}
 endif
 
 if executable('indent')
-
   function! vimrc#format_c_program(has_bang) abort range " {{{
     let indent_cmd = substitute(vimrc#indent_cmd, 'SHIFTWIDTH', &shiftwidth, 'g')
     let indent_cmd = substitute(indent_cmd, 'SOFTTABSTOP', &softtabstop < 0 ? &shiftwidth : &softtabstop, 'g')
@@ -664,7 +663,7 @@ if executable('indent')
   endfunction " }}}
 else
   function! vimrc#format_c_program(has_bang) abort range " {{{
-    echoerr 'command not found:' a:file
+    echoerr 'command not found: indent'
   endfunction " }}}
 endif
 
@@ -676,7 +675,7 @@ if executable('pdftotext')
   endfunction " }}}
 else
   function! vimrc#pdftotext(file) abort " {{{
-    echoerr 'command not found:' a:file
+    echoerr 'command not found: pdftotext'
   endfunction " }}}
 endif
 
