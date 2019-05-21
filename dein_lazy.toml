@@ -91,6 +91,12 @@ on_cmd = 'NeoIncludeMakeCache'
 
 [[plugins]]
 repo = 'Shougo/neomru.vim'
+on_cmd = [
+  'NeoMRUReload',
+  'NeoMRUSave',
+  'NeoMRUImportFile',
+  'NeoMRUImportDirectory'
+]
 on_source = 'unite.vim'
 
 [[plugins]]
@@ -277,6 +283,7 @@ on_cmd = ['Agit', 'AgitFile']
 [[plugins]]
 repo = 'ctrlpvim/ctrlp.vim'
 on_cmd = ['CtrlP', 'CtrlPMRUFiles', 'CtrlPBuffer', 'CtrlPLastMode', 'CtrlPClearCache', 'CtrlPClearAllCaches', 'CtrlPCtrlPCache', 'CtrlPAllCtrlPCaches', 'CtrlPCurWD', 'CtrlPCurFile', 'CtrlPRoot', 'CtrlPTag', 'CtrlPQuickfix', 'CtrlPDir', 'CtrlPBufTag', 'CtrlPBufTagAll', 'CtrlPRTS', 'CtrlPUndo', 'CtrlPLine', 'CtrlPChange', 'CtrlPChangeAll', 'CtrlPMixed', 'CtrlPBookmarkDir', 'CtrlPBookmarkDirAdd']
+on_func = 'ctrlp'
 hook_add = '''
 let g:ctrlp_path_nolim = 1
 let g:ctrlp_key_loop = 1
@@ -348,13 +355,12 @@ repo = 'gregsexton/VimCalc'
 on_cmd = 'Calc'
 
 [[plugins]]
-repo = 'haya14busa/dein-command.vim'
-on_cmd = 'Dein'
+repo = 'wsdjeg/dein-ui.vim'
+on_cmd = ['SPUpdate', 'SPReinstall', 'SPInstall', 'DeinUpdate']
 
 [[plugins]]
-repo = 'haya14busa/vim-textobj-number'
-depends = 'vim-textobj-user'
-on_map = [['xo', 'an'], ['xo', 'in']]
+repo = 'haya14busa/dein-command.vim'
+on_cmd = 'Dein'
 
 [[plugins]]
 repo = 'haya14busa/vim-undoreplay'
@@ -420,6 +426,11 @@ nmap <Space>A  <Plug>(altr-back)
 '''
 
 [[plugins]]
+repo = 'thinca/vim-textobj-between'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'af'], ['xo', 'if'], ['xo', '<Plug>(textobj-between-']]
+
+[[plugins]]
 repo = 'kana/vim-textobj-entire'
 depends = 'vim-textobj-user'
 on_map = [['xo', 'ae'], ['xo', 'ie']]
@@ -440,9 +451,29 @@ depends = 'vim-textobj-user'
 on_map = [['xo', 'al'], ['xo', 'il']]
 
 [[plugins]]
+repo = 'osyo-manga/vim-textobj-multiblock'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'ab'], ['xo', 'ib'], ['xo', '<Plug>(textobj-multiblock-']]
+
+[[plugins]]
+repo = 'haya14busa/vim-textobj-number'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'an'], ['xo', 'in']]
+
+[[plugins]]
 repo = 'kana/vim-textobj-syntax'
 depends = 'vim-textobj-user'
 on_map = [['xo', 'ay'], ['xo', 'iy']]
+
+[[plugins]]
+repo = 'lucapette/vim-textobj-underscore'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'a_'], ['xo', 'i_']]
+
+[[plugins]]
+repo = 'mattn/vim-textobj-url'
+depends = 'vim-textobj-user'
+on_map = [['xo', 'au'], ['xo', 'iu']]
 
 [[plugins]]
 repo = 'katono/rogue.vim'
@@ -638,7 +669,7 @@ let mozaicfm#verbose = 1
 repo = 'koturn/vim-mplayer'
 depends = ['unite.vim', 'ctrlp.vim', 'alti.vim', 'vim-milqi']
 on_cmd = ['AltiMPlayer', 'AltiMPlayerMru', 'CtrlPMPlayer', 'CtrlPMPlayerMru', 'MilqiMPlayer', 'MilqiMPlayerMru', 'FZFMPlayer', 'FZFMPlayerMru', 'MPlayer', 'MPlayerEnqueue', 'MPlayerMru', 'MPlayerMruEnqueue', 'MPlayerMruUpdate', 'MPlayerMruReload', 'MPlayerMruClear', 'MPlayerCommand', 'MPlayerStop', 'MPlayerVolume', 'MPlayerVolumeBar', 'MPlayerSpeed', 'MPlayerEqualizer', 'MPlayerToggleMute', 'MPlayerTogglePause', 'MPlayerToggleRTTimeInfo', 'MPlayerLoop', 'MPlayerSeek', 'MPlayerSeekToHead', 'MPlayerSeekToEnd', 'MPlayerOperateWithKey', 'MPlayerPrev', 'MPlayerNext', 'MPlayerShowFileInfo', 'MPlayerCommand', 'MPlayerGetProperty', 'MPlayerSetProperty', 'MPlayerStepProperty', 'MPlayerHelp', 'MPlayerFlush']
-on_source = ['unite.vim', 'denite.nvim']
+on_source = ['denite.nvim', 'unite.vim']
 hook_add = '''
 if has('win32')
   let mplayer#mplayer = 'C:/CommonUtil/mplayer/mplayer.exe'
@@ -727,11 +758,6 @@ on_ft = ['lisp', 'scheme', 'clojure']
 on_path = ['\.lisp$', '\.scm$', '\.clojure$']
 
 [[plugins]]
-repo = 'lucapette/vim-textobj-underscore'
-depends = 'vim-textobj-user'
-on_map = [['xo', 'a_'], ['xo', 'i_']]
-
-[[plugins]]
 repo = 'majutsushi/tagbar'
 on_cmd = ['Tagbar', 'TagbarToggle', 'TagbarOpen', 'TagbarOpenAutoClose', 'TagbarClose', 'TagbarSetFoldlevel', 'TagbarShowTag', 'TagbarCurrentTag', 'TagbarGetTypeConfig', 'TagbarDebug', 'TagbarDebugEnd', 'TagbarTogglePause']
 
@@ -772,11 +798,6 @@ on_source = 'unite.vim'
 hook_add = '''
 let g:startmenu_interface = 'unite'
 '''
-
-[[plugins]]
-repo = 'mattn/vim-textobj-url'
-depends = 'vim-textobj-user'
-on_map = [['xo', 'au'], ['xo', 'iu']]
 
 [[plugins]]
 repo = 'mopp/AOJ.vim'
@@ -842,11 +863,6 @@ let g:sugarpot_convert_resize = '50%x25%'
 '''
 
 [[plugins]]
-repo = 'osyo-manga/vim-textobj-multiblock'
-depends = 'vim-textobj-user'
-on_map = [['xo', 'ab'], ['xo', 'ib'], ['xo', '<Plug>(textobj-multiblock-']]
-
-[[plugins]]
 repo = 'pocket7878/presen-vim'
 depends = 'curses-vim'
 on_cmd = ['Presen', 'Vp2html']
@@ -854,10 +870,8 @@ on_ft = 'vimpresen'
 
 [[plugins]]
 repo = 'previm/previm'
-on_cmd = 'PrevimOpen'
-hook_source = '''
-call dein#source('open-browser.vim')
-'''
+depends = 'open-browser.vim'
+on_ft = ['asciidoc', 'markdown', 'textile', 'rst']
 
 [[plugins]]
 repo = 'rbtnn/puyo.vim'
@@ -984,11 +998,6 @@ on_cmd = 'Scouter'
 [[plugins]]
 repo = 'thinca/vim-showtime'
 on_cmd = ['ShowtimeStart', 'ShowtimeResume']
-
-[[plugins]]
-repo = 'thinca/vim-textobj-between'
-depends = 'vim-textobj-user'
-on_map = [['xo', 'af'], ['xo', 'if'], ['xo', '<Plug>(textobj-between-']]
 
 [[plugins]]
 repo = 'thinca/vim-threes'
