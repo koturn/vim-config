@@ -59,8 +59,15 @@ let s:keymsgs = [
       \ "Don't use Delete-Key!!  Press 'x' in Normal-Mode!!!!",
       \ "Don't use Backspace-Key!!  Press 'X' in Normal-Mode!!!!"
       \]
+let s:git_gc_options = [
+      \ '-q',
+      \ '--aggressive',
+      \ '--auto',
+      \ '--no-prune',
+      \ '--prune',
+      \ '--quiet'
+      \]
 " }}}
-
 
 function! vimrc#retab_head() abort " {{{
   if &l:tabstop != a:width
@@ -360,10 +367,23 @@ function! vimrc#show_interp_version() abort " {{{
   endfor
 endfunction " }}}
 
+function! vimrc#dein_git_gc(...) abort " {{{
+  let options = join(a:000)
+  for [name, path] in items(map(filter(dein#get(), "v:val.type ==# 'git'"), 'v:val.path'))
+    echon printf('git gc %s: %s ... ', options, name)
+    call system(printf("cd '%s' && git gc %s", path, options))
+    echo 'done'
+  endfor
+endfunction " }}}
+
 function! vimrc#dein_name_complete(arglead, cmdline, cursorpos) abort " {{{
   let arglead = tolower(a:arglead)
-  echomsg a:arglead
   return filter(keys(dein#get()), '!stridx(tolower(v:val), arglead)')
+endfunction " }}}
+
+function! vimrc#git_gc_option_complete(arglead, cmdline, cursorpos) abort " {{{
+  let arglead = tolower(a:arglead)
+  return filter(copy(s:git_gc_options), '!stridx(tolower(v:val), arglead)')
 endfunction " }}}
 
 if exists('*win_gotoid')

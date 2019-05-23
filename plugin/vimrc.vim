@@ -46,6 +46,7 @@ command! -bar -range=% MakeVimLFoldings  call vimrc#make_viml_foldings(<line1>, 
 command! -bar TabInfo call vimrc#show_tab_info()
 command! -bar CheckInterpVersion  call vimrc#show_interp_version()
 " command! -bar -nargs=+ -complete=customlist,vimrc#dein_name_complete DeinUpdate  call dein#update([<f-args>])
+command! -bar -nargs=* -complete=customlist,vimrc#git_gc_option_complete DeinGitGc  call vimrc#dein_git_gc(<f-args>)
 if exists('*win_gotoid')
   command! -bar -nargs=1 -complete=buffer Buffer  call vimrc#buf_open_existing(<f-args>, <q-mods>)
 else
