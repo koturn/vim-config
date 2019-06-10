@@ -107,16 +107,16 @@ function! hookadd#eskk() abort " {{{
     endif
     let dstpath = fnamemodify(expand(g:eskk#large_dictionary.path), ':h') . '/SKK-JISYO.L.gz'
     if dl_client ==# 'wget'
-      echo s:system(printf('wget %s -O "%s"', dict_url, dstpath))
+      echo vimrc#system(printf('wget %s -O "%s"', dict_url, dstpath))
     else
-      echo s:system(printf('curl -O %s -o "%s"', dict_url, dstpath))
+      echo vimrc#system(printf('curl -O %s -o "%s"', dict_url, dstpath))
     endif
     echomsg 'Downloaded SKK-JISYO.L.gz: ' . dstpath
     if !executable('gzip')
       echoerr 'command: gzip is not available'
       return
     endif
-    echo s:system('gzip -df ' . dstpath)
+    echo vimrc#system('gzip -df ' . dstpath)
     echomsg 'Decompressed SKK-JISYO.L.gz'
     if tolower(g:eskk#large_dictionary.encoding) !=# 'euc-jp'
       let fname = fnamemodify(dstpath, ':r')

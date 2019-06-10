@@ -386,6 +386,11 @@ function! vimrc#git_gc_option_complete(arglead, cmdline, cursorpos) abort " {{{
   return filter(copy(s:git_gc_options), '!stridx(tolower(v:val), arglead)')
 endfunction " }}}
 
+function! vimrc#system(cmd) abort " {{{
+  return s:system(a:cmd)
+endfunction " }}}
+
+
 if exists('*win_gotoid')
   function! vimrc#buf_open_existing(bname, ...) abort " {{{
     let bnr = bufnr(a:bname)
