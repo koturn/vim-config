@@ -329,9 +329,11 @@ if has('clipboard') && !s:is_nvim
   endif
 endif
 
-if s:is_tmux
-  set t_ut=
-elseif exists('&termguicolors') && ($COLORTERM == 'truecolor' || s:is_cui && g:is_windows && has('vcon'))
+if s:is_cui && exists('&termguicolors') && ($COLORTERM ==# 'truecolor' || g:is_windows && has('vtp'))
+  if s:is_tmux && !has('nvim')
+    let &t_8f = "\e[38;2;%lu;%lu;%lum"
+    let &t_8b = "\e[48;2;%lu;%lu;%lum"
+  endif
   set termguicolors
 endif
 
