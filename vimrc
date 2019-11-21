@@ -213,6 +213,13 @@ function! s:executable(cmd) abort " {{{
   return s:_executable[a:cmd]
 endfunction " }}}
 
+if !s:is_nvim
+  packadd! matchit
+  " source $VIMRUNTIME/macros/matchit.vim
+  let g:hl_matchit_enable_on_vim_startup = 1
+  let g:hl_matchit_speed_level = 1
+  let g:hl_matchit_allow_ft_regexp = 'html\|vim\|sh'
+endif
 set pastetoggle=<F10>
 set helplang=ja
 set shortmess& shortmess+=I
@@ -291,7 +298,7 @@ set spelllang=en,cjk
 set completeopt=menu,preview
 set showfulltag
 if s:executable('ag')
-  setglobal grepprg=ag\ --nogroup\ -iS
+  setglobal grepprg=ag\ --vimgrep\ -iS
   set grepformat=%f:%l:%m
 elseif s:executable('ack')
   setglobal grepprg=ack\ --nogroup
@@ -540,7 +547,7 @@ autocmd MyAutoCmd FileType c,cpp
       \ command! -bar -bang -range=% -buffer FormatCProgram
       \ <line1>,<line2>call vimrc#format_c_program(<bang>0)
 
-if exists('#TerminalOpen')
+if exists('##TerminalOpen')
   function! Tapi_Drop(bufnum, arglist) abort " {{{
     let [pwd, argv] = [a:arglist[0] . '/', a:arglist[1 :]]
     for arg in map(argv, 'pwd . v:val')
@@ -714,7 +721,7 @@ augroup MyAutoCmd " {{{
   au FileType c             setlocal                      cindent cinoptions& cinoptions+=g0,l0,N-s,t0 cinkeys-=0#
   au FileType cpp           setlocal                      cindent cinoptions& cinoptions+=g0,j1,l0,N-s,t0,ws,Ws,(0 cinkeys-=0#
   " )
-  au FileType cs            setlocal sw=4 ts=4 sts=4 noet foldmethod=syntax
+  au FileType cs            setlocal sw=4 ts=4 sts=4 et   cindent foldmethod=syntax
   au FileType java          setlocal sw=4 ts=4 sts=4 noet cindent cinoptions& cinoptions+=j1
   au FileType javascript    setlocal sw=2 ts=2 sts=2      cindent cinoptions& cinoptions+=j1,J1,(s
   " )
