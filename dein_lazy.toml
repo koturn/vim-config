@@ -1269,3 +1269,14 @@ hook_add = '''
 nmap <Leader>f <plug>(easymotion-overwin-f2)
 let g:EasyMotion_smartcase = 1
 '''
+
+[[plugins]]
+repo = 'vim/killersheep'
+if = "has('patch-8.1.1705')"
+on_cmd = 'KillKillKill'
+
+[[plugins]]
+repo = 'prabirshrestha/vim-lsp'
+depends = 'async.vim'
+on_event = 'InsertEnter'
+on_func = 'lsp'

@@ -153,3 +153,17 @@ repo = 'Shougo/unite-outline'
 
 [[plugins]]
 repo = 'cespare/vim-toml'
+
+[[plugins]]
+repo = 'prabirshrestha/async.vim'
+
+[[plugins]]
+repo = 'mattn/vim-lsp-settings'
+depends = ['async.vim', 'vim-lsp']
+hook_add = '''
+let g:lsp_settings_servers_dir = expand('~/.vim/vim-lsp-settings/servers')
+'''
+
+[[plugins]]
+repo = 'lighttiger2505/deoplete-vim-lsp'
+depends = ['deoplete.nvim', 'async.vim', 'vim-lsp']
