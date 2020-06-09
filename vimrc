@@ -601,7 +601,7 @@ xnoremap ,s  :<C-u>call vimrc#store_selected_text()<CR>/<C-u><C-r>"<CR>N
 xnoremap ,S  :<C-u>call vimrc#store_selected_text(0)<CR>/<C-u>\m<C-r>"<CR>N
 xnoremap ,<C-s>  :<C-u>call vimrc#store_selected_text(1)<CR>/<C-u>\M<C-r>"<CR>N
 xnoremap ,<M-s>  :<C-u>call vimrc#store_selected_text(2)<CR>/<C-u>\v<C-r>"<CR>N
-xnoremap ,g  :<C-u>call vimrc#store_selected_text()<CR>:<C-u>vimgrep/<C-r>"/ **/*<Left><Left><Left><Left><Left><Left>
+xnoremap ,g  :<C-u>call vimrc#store_selected_text()<CR>:<C-u>vimgrep /<C-r>"/ **/*<Left><Left><Left><Left><Left><Left>
 
 nnoremap <silent> <M-p>  :<C-u>call vimrc#complete_xml_tag()<CR>
 inoremap <silent> <M-p>  <Esc>:call vimrc#complete_xml_tag()<CR>

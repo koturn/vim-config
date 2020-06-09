@@ -70,6 +70,8 @@ command! -bar -complete=file -nargs=1 Pdf  call vimrc#pdftotext(<q-args>)
 command! -bar BinaryRead  call vimrc#read_binary()
 command! -bar BinaryWrite  call vimrc#write_binary()
 command! -bar BinaryDecode  call vimrc#decode_binary()
+command! -bar -nargs=1 GitGrep  call vimrc#gitgrep(<f-args>)
+command! -bar FindConflict  /^[<>=]\{7\}
 
 
 let &cpo = s:save_cpo

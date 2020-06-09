@@ -260,7 +260,9 @@ function! vimrc#speed_up(has_bang) abort " {{{
   else
     set noshowmatch nocursorline nocursorcolumn colorcolumn=
   endif
-  NoMatchParen
+  if exists(':NoMatchParen')
+    NoMatchParen
+  endif
   set laststatus=0 showtabline=0
   if !s:is_cui
     set guicursor=a:blinkon0
@@ -817,6 +819,17 @@ function! vimrc#dein_install(install_dir) abort " {{{
   call dein#install()
 endfunction " }}}
 
+function! vimrc#gitgrep(query) " {{{
+  let [old_grepprg, old_grepformat] = [&l:grepprg, &l:grepformat]
+  setlocal grepprg=git\ grep\ -I\ --no-color\ --line-number
+  setlocal grepformat=%f:%l:%m
+  execute 'silent! grep! ' . a:query
+  let [&l:grepprg, &l:grepformat] = [old_grepprg, old_grepformat]
+  if v:shell_error == 0
+    silent! cnext
+  endif
+  redraw!
+endfunction " }}}
 
 function! s:redir(cmd) abort " {{{
   let [verbose, verbosefile] = [&verbose, &verbosefile]
