@@ -42,6 +42,12 @@ repo = 'koturn/vim-serverutil'
 repo = 'Mizuchi/STL-Syntax'
 
 [[plugins]]
+repo = 'Shougo/neco-syntax'
+
+[[plugins]]
+repo = 'Shougo/neco-vim'
+
+[[plugins]]
 repo = 'Shougo/neosnippet-snippets'
 
 [[plugins]]

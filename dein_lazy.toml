@@ -1280,3 +1280,11 @@ repo = 'prabirshrestha/vim-lsp'
 depends = 'async.vim'
 on_event = 'InsertEnter'
 on_func = 'lsp'
+
+[[plugins]]
+repo = 'tpope/vim-abolish'
+on_cmd = ['Abolish', 'Subvert', 'S']
+on_map = [['n', '<Plug>(abolish-coerce']]
+hook_add = '''
+nmap cr  <Plug>(abolish-coerce-word)
+'''
