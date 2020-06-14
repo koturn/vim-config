@@ -173,3 +173,6 @@ let g:lsp_settings_servers_dir = expand('~/.vim/vim-lsp-settings/servers')
 [[plugins]]
 repo = 'lighttiger2505/deoplete-vim-lsp'
 depends = ['deoplete.nvim', 'async.vim', 'vim-lsp']
+
+[[plugins]]
+repo = 'koturn/vim-shaderlab'

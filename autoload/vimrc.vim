@@ -117,7 +117,7 @@ function! vimrc#smart_split(cmd) abort " {{{
   execute a:cmd
 endfunction " }}}
 
-function! vimrc#clear_message() " {{{
+function! vimrc#clear_message() abort " {{{
   for i in range(201)
     echomsg ''
   endfor
@@ -545,7 +545,7 @@ else
   endfunction " }}}
 endif
 
-function! vimrc#get_highlight_info_lines(lnum, col) " {{{
+function! vimrc#get_highlight_info_lines(lnum, col) abort " {{{
   let lines = []
   for synid in synstack(a:lnum, a:col)
     let hldef_dict = s:generate_hldef_dict({}, synid)
@@ -819,7 +819,7 @@ function! vimrc#dein_install(install_dir) abort " {{{
   call dein#install()
 endfunction " }}}
 
-function! vimrc#gitgrep(query) " {{{
+function! vimrc#gitgrep(query) abort " {{{
   let [old_grepprg, old_grepformat] = [&l:grepprg, &l:grepformat]
   setlocal grepprg=git\ grep\ -I\ --no-color\ --line-number
   setlocal grepformat=%f:%l:%m
