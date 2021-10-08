@@ -1094,52 +1094,48 @@ let g:eskk#egg_like_newline = 1
 let g:eskk#keep_state = 1
 
 function! s:eskk_map() abort
+  let data = map({
+        \ ',': '，',
+        \ '.': '．',
+        \ '0': '０',
+        \ '1': '１',
+        \ '2': '２',
+        \ '3': '３',
+        \ '4': '４',
+        \ '5': '５',
+        \ '6': '６',
+        \ '7': '７',
+        \ '8': '８',
+        \ '9': '９',
+        \ '"': '”',
+        \ '#': '＃',
+        \ '$': '＄',
+        \ '%': '％',
+        \ '&': '＆',
+        \ "'": '’',
+        \ '(': '（',
+        \ ')': '）',
+        \ '=': '＝',
+        \ '~': '～',
+        \ '|': '｜',
+        \ '@': '＠',
+        \ '`': '‘',
+        \ '{': '｛',
+        \ '+': '＋',
+        \ '*': '＊',
+        \ '}': '｝',
+        \ '<': '＜',
+        \ '>': '＞',
+        \ '\': '￥',
+        \ '_': '＿',
+        \ ' ': '　'
+        \}, '{"method": "add", "data": [v:val, ""]}')
   let table = eskk#table#new('rom_to_hira*', 'rom_to_hira')
-  call s:eskk_map_zenkaku(table)
+  let table._data = data
   call eskk#register_mode_table('hira', table)
   let table = eskk#table#new('rom_to_kata*', 'rom_to_kata')
-  call s:eskk_map_zenkaku(table)
+  let table._data = copy(data)
   call eskk#register_mode_table('kata', table)
-endfunction
-
-function! s:eskk_map_zenkaku(table) abort
-  call a:table.add_map(',', '，')
-  call a:table.add_map('.', '．')
-
-  call a:table.add_map('0', '０')
-  call a:table.add_map('1', '１')
-  call a:table.add_map('2', '２')
-  call a:table.add_map('3', '３')
-  call a:table.add_map('4', '４')
-  call a:table.add_map('5', '５')
-  call a:table.add_map('6', '６')
-  call a:table.add_map('7', '７')
-  call a:table.add_map('8', '８')
-  call a:table.add_map('9', '９')
-
-  call a:table.add_map('"', '”')
-  call a:table.add_map('#', '＃')
-  call a:table.add_map('$', '＄')
-  call a:table.add_map('%', '％')
-  call a:table.add_map('&', '＆')
-  call a:table.add_map("'", '’')
-  call a:table.add_map('(', '（')
-  call a:table.add_map(')', '）')
-
-  call a:table.add_map('=', '＝')
-  call a:table.add_map('~', '～')
-  call a:table.add_map('|', '｜')
-  call a:table.add_map('@', '＠')
-  call a:table.add_map('`', '‘')
-  call a:table.add_map('{', '｛')
-  call a:table.add_map('+', '＋')
-  call a:table.add_map('*', '＊')
-  call a:table.add_map('}', '｝')
-  call a:table.add_map('<', '＜')
-  call a:table.add_map('>', '＞')
-  call a:table.add_map('\', '￥')
-  call a:table.add_map('_', '＿')
-  call a:table.add_map(' ', '　')
 endfunction
 autocmd MyAutoCmd User eskk-initialize-pre  call s:eskk_map()
 
