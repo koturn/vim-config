@@ -36,10 +36,113 @@ repo = 'thinca/vim-themis'
 repo = 'cocopon/iceberg.vim'
 
 [[plugins]]
-repo = 'koturn/vim-serverutil'
+repo = 'prabirshrestha/asyncomplete-lsp.vim'
 
 [[plugins]]
-repo = 'Mizuchi/STL-Syntax'
+repo = 'prabirshrestha/asyncomplete-buffer.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#buffer#get_source_options({
+      \   'name': 'buffer',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#buffer#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-file.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#file#get_source_options({
+      \   'name': 'file',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#file#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'yami-beta/asyncomplete-omni.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#omni#get_source_options({
+      \   'name': 'omni',
+      \   'allowlist': ['*'],
+      \   'blocklist': ['c', 'cpp', 'html'],
+      \   'completor': function('asyncomplete#sources#omni#completor'),
+      \   'config': {
+      \     'show_source_kind': 1
+      \   }
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-emoji.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#emoji#get_source_options({
+      \   'name': 'emoji',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#emoji#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-neosnippet.vim'
+depends = 'neosnippet.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#neosnippet#get_source_options({
+      \   'name': 'neosnippet',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#neosnippet#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-emmet.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#emmet#get_source_options({
+      \   'name': 'emmet',
+      \   'allowlist': ['html'],
+      \   'completor': function('asyncomplete#sources#emmet#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-tags.vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#tags#get_source_options({
+      \   'name': 'tags',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#tags#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-necovim.vim'
+depends = 'neco-vim'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#necovim#get_source_options({
+      \   'name': 'necovim',
+      \   'allowlist': ['vim'],
+      \   'completor': function('asyncomplete#sources#necovim#completor')
+      \ }))
+'''
+
+[[plugins]]
+repo = 'prabirshrestha/asyncomplete-necosyntax.vim'
+depends = 'neco-syntax'
+hook_add = '''
+autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#necosyntax#get_source_options({
+      \   'name': 'necosyntax',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#necosyntax#completor')
+      \ }))
+'''
 
 [[plugins]]
 repo = 'Shougo/neco-syntax'
@@ -165,14 +268,14 @@ repo = 'prabirshrestha/async.vim'
 
 [[plugins]]
 repo = 'mattn/vim-lsp-settings'
-depends = ['async.vim', 'vim-lsp']
+depends = 'vim-lsp'
 hook_add = '''
 let g:lsp_settings_servers_dir = expand('~/.vim/vim-lsp-settings/servers')
 '''
 
-[[plugins]]
-repo = 'lighttiger2505/deoplete-vim-lsp'
-depends = ['deoplete.nvim', 'async.vim', 'vim-lsp']
+# [[plugins]]
+# repo = 'lighttiger2505/deoplete-vim-lsp'
+# depends = ['deoplete.nvim', 'async.vim', 'vim-lsp']
 
 [[plugins]]
 repo = 'koturn/vim-shaderlab'
