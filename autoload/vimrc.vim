@@ -1032,10 +1032,10 @@ function! s:check_dein_requirements() abort " {{{
   if !s:is_nvim && v:version < 800
     echoerr 'Please use Vim 8.0 or above or NeoVim!'
     return 0
-  elseif !s:executable('git')
+  elseif !executable('git')
     echoerr 'Please install git!'
     return 0
-  elseif !s:executable('rsync')
+  elseif !executable('rsync')
     echoerr 'Please install rsync!'
     return 0
   endif
