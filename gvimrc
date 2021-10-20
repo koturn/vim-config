@@ -17,7 +17,7 @@ set winaltkeys=no
 set guicursor+=a:blinkon0
 
 function! s:get_sid_prefix() abort " {{{
-  return matchstr(expand('<sfile>'), '^function \zs<SNR>\d\+_\zeget_sid_prefix$')
+  return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeget_sid_prefix$')
 endfun " }}}
 let s:sid_prefix = s:get_sid_prefix()
 delfunction s:get_sid_prefix
