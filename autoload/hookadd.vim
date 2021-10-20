@@ -20,33 +20,33 @@ function! hookadd#lightline() abort " {{{
         \   'right': [['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype'], ['time']]
         \ },
         \ 'component_function': {
-        \   'modified': s:sid_prefix . 'light_line_modified',
-        \   'eskk_status': s:sid_prefix . 'light_line_eskk_status',
-        \   'readonly': s:sid_prefix . 'light_line_readonly',
-        \   'fugitive': s:sid_prefix . 'light_line_fugitive',
-        \   'filename': s:sid_prefix . 'light_line_filename',
-        \   'fileformat': s:sid_prefix . 'light_line_fileformat',
-        \   'filetype': s:sid_prefix . 'light_line_filetype',
-        \   'fileencoding': s:sid_prefix . 'light_line_fileencoding',
-        \   'mode': s:sid_prefix . 'light_line_mode',
-        \   'time': s:sid_prefix . 'light_line_time'
+        \   'modified': s:sid_prefix . 'll_modified',
+        \   'eskk_status': s:sid_prefix . 'll_eskk_status',
+        \   'readonly': s:sid_prefix . 'll_readonly',
+        \   'fugitive': s:sid_prefix . 'll_fugitive',
+        \   'filename': s:sid_prefix . 'll_filename',
+        \   'fileformat': s:sid_prefix . 'll_fileformat',
+        \   'filetype': s:sid_prefix . 'll_filetype',
+        \   'fileencoding': s:sid_prefix . 'll_fileencoding',
+        \   'mode': s:sid_prefix . 'll_mode',
+        \   'time': s:sid_prefix . 'll_time'
         \ }
         \}
-  function! s:light_line_modified() abort
+  function! s:ll_modified() abort " {{{
     return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-  endfunction
-  function! s:light_line_readonly() abort
+  endfunction " }}}
+  function! s:ll_readonly() abort " {{{
     return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
-  endfunction
-  function! s:light_line_filename() abort
-    return ('' != s:light_line_readonly() ? s:light_line_readonly() . ' ' : '') .
-          \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
-          \  &ft == 'unite' ? unite#get_status_string() :
-          \  &ft == 'vimshell' ? vimshell#get_status_string() :
-          \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
-          \ ('' != s:light_line_modified() ? ' ' . s:light_line_modified() : '')
-  endfunction
-  function! s:light_line_fugitive() abort
+  endfunction " }}}
+  function! s:ll_filename() abort " {{{
+    return ('' !=# s:ll_readonly() ? s:ll_readonly() . ' ' : '') .
+          \ (&ft ==# 'vimfiler' ? vimfiler#get_status_string() :
+          \  &ft ==# 'unite' ? unite#get_status_string() :
+          \  &ft ==# 'vimshell' ? vimshell#get_status_string() :
+          \ '' !=# expand('%:t') ? expand('%:t') : '[No Name]') .
+          \ ('' !=# s:ll_modified() ? ' ' . s:ll_modified() : '')
+  endfunction " }}}
+  function! s:ll_fugitive() abort " {{{
     try
       if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
         return fugitive#head()
@@ -54,27 +54,26 @@ function! hookadd#lightline() abort " {{{
     catch
     endtry
     return ''
-  endfunction
-  function! s:light_line_fileformat() abort
+  endfunction " }}}
+  function! s:ll_fileformat() abort " {{{
     return winwidth(0) > 70 ? &fileformat : ''
-  endfunction
-  function! s:light_line_filetype() abort
+  endfunction " }}}
+  function! s:ll_filetype() abort " {{{
     return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
-  endfunction
-  function! s:light_line_fileencoding() abort
+  endfunction " }}}
+  function! s:ll_fileencoding() abort " {{{
     return winwidth(0) > 70 ? ((strlen(&fenc) ? &fenc : &enc) . (&bomb ? ' (BOM)' : '')) : ''
-  endfunction
-  function! s:light_line_mode() abort
+  endfunction " }}}
+  function! s:ll_mode() abort " {{{
     return winwidth(0) > 60 ? lightline#mode() : ''
-  endfunction
-  function! s:light_line_time() abort
+  endfunction " }}}
+  function! s:ll_time() abort " {{{
     return winwidth(0) > 80 ? strftime('%Y/%m/%d(%a) %H:%M:%S') : ''
-  endfunction
-  function! s:light_line_eskk_status() abort
+  endfunction " }}}
+  function! s:ll_eskk_status() abort " {{{
     return winwidth(0) > 60 && lightline#mode() ==# 'INSERT' && exists('*eskk#statusline') ? eskk#statusline() ==# '[eskk:あ]' ? '[あ]' : '[--]' : '[--]'
-  endfunction
+  endfunction " }}}
 endfunction " }}}
-
 
 function! hookadd#eskk() abort " {{{
   function! s:toggle_ime() abort " {{{
