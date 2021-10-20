@@ -2,6 +2,12 @@ let s:save_cpo = &cpo
 set cpo&vim
 scriptencoding utf-8
 
+function! s:get_sid_prefix() abort " {{{
+  return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeget_sid_prefix$')
+endfunction " }}}
+let s:sid_prefix = s:get_sid_prefix()
+delfunction s:get_sid_prefix
+
 
 function! pluginconfig#quickrun() abort " {{{
   let has_job = has('job') || has('nvim')
@@ -228,6 +234,32 @@ function! pluginconfig#switch() abort " {{{
         \ [510, ':not_extended'],
         \ [511, ':network_authentication_required'],
         \]
+endfunction " }}}
+
+function! pluginconfig#vim_lsp() abort " {{{
+  setlocal omnifunc=lsp#complete signcolumn=yes
+  if exists('+tagfunc')
+    function! s:lsp_tagfunc(pattern, flags, info) abort " {{{
+      let candidates = lsp#tagfunc(a:pattern, a:flags, a:info)
+      return len(candidates) == 0 ? v:null : candidates
+    endfunction " }}}
+    let &l:tagfunc = s:sid_prefix . 'lsp_tagfunc'
+  endif
+  nnoremap [lsp] <Nop>
+  nmap ,l  [lsp]
+  nmap <buffer> [lsp]d <plug>(lsp-definition)
+  nmap <buffer> [lsp]i <plug>(lsp-implementation)
+  nmap <buffer> [lsp]r <plug>(lsp-references)
+  nmap <buffer> [lsp]R <plug>(lsp-rename)
+  nmap <buffer> [lsp]s <plug>(lsp-document-symbol-search)
+  nmap <buffer> [lsp]S <plug>(lsp-workspace-symbol-search)
+  nmap <buffer> [lsp]t <plug>(lsp-type-definition)
+  nmap <buffer> [L <plug>(lsp-previous-diagnostic)
+  nmap <buffer> ]L <plug>(lsp-next-diagnostic)
+  nmap <buffer> K <plug>(lsp-hover)
+  inoremap <buffer> <expr><C-f> lsp#scroll(+4)
+  inoremap <buffer> <expr><C-d> lsp#scroll(-4)
+  let g:lsp_format_sync_timeout = 1000
 endfunction " }}}
 
 

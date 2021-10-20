@@ -37,24 +37,11 @@ on_cmd = ['Denite', 'DeniteBufferDir', 'DeniteCursorWord']
 
 [[plugins]]
 repo = 'prabirshrestha/asyncomplete.vim'
-depends = [
-  'asyncomplete-buffer.vim',
-  'asyncomplete-file.vim',
-  'asyncomplete-omni.vim',
-  'asyncomplete-emoji.vim',
-  'asyncomplete-neosnippet.vim',
-  'asyncomplete-emmet.vim',
-  'asyncomplete-tags.vim',
-  'asyncomplete-necovim.vim',
-  'asyncomplete-necosyntax.vim',
-  'asyncomplete-lsp.vim'
-]
 on_event = 'InsertEnter'
 on_map = [['i', '<Plug>(asyncomplete_force_refresh)']]
 on_func = 'asyncomplete'
 hook_add = '''
 let g:asyncomplete_min_chars = 3
-let g:asyncomplete_log_file = expand('~/.vim/asyncomplete/log.log')
 '''
 
 [[plugins]]
@@ -1301,28 +1288,7 @@ on_cmd = [
 ]
 on_func = 'lsp'
 hook_add = '''
-function! s:on_lsp_buffer_enabled() abort
-  setlocal omnifunc=lsp#complete signcolumn=yes
-  if exists('+tagfunc')
-    setlocal tagfunc=lsp#tagfunc
-  endif
-  nnoremap [lsp] <Nop>
-  nmap ,l  [lsp]
-  nmap <buffer> [lsp]d <plug>(lsp-definition)
-  nmap <buffer> [lsp]i <plug>(lsp-implementation)
-  nmap <buffer> [lsp]r <plug>(lsp-references)
-  nmap <buffer> [lsp]R <plug>(lsp-rename)
-  nmap <buffer> [lsp]s <plug>(lsp-document-symbol-search)
-  nmap <buffer> [lsp]S <plug>(lsp-workspace-symbol-search)
-  nmap <buffer> [lsp]t <plug>(lsp-type-definition)
-  nmap <buffer> [L <plug>(lsp-previous-diagnostic)
-  nmap <buffer> ]L <plug>(lsp-next-diagnostic)
-  nmap <buffer> K <plug>(lsp-hover)
-  inoremap <buffer> <expr><C-f> lsp#scroll(+4)
-  inoremap <buffer> <expr><C-d> lsp#scroll(-4)
-  let g:lsp_format_sync_timeout = 1000
-endfunction
-autocmd MyAutoCmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+autocmd MyAutoCmd User lsp_buffer_enabled call pluginconfig#vim_lsp()
 '''
 
 [[plugins]]
