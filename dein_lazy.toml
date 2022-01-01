@@ -234,14 +234,16 @@ on_cmd = 'Vimcastle'
 [[plugins]]
 repo = 'christoomey/vim-tmux-navigator'
 on_cmd = ['TmuxNavigateLeft', 'TmuxNavigateDown', 'TmuxNavigateUp', 'TmuxNavigateRight', 'TmuxNavigatePrevious']
-if = "$TMUX !=# ''"
+if = "$TMUX !=# '' && !has('gui_running')"
 hook_add = '''
-let g:tmux_navigator_no_mappings = 1
-nnoremap <silent> <C-w>h  :<C-u>TmuxNavigateLeft<CR>
-nnoremap <silent> <C-w>j  :<C-u>TmuxNavigateDown<CR>
-nnoremap <silent> <C-w>k  :<C-u>TmuxNavigateUp<CR>
-nnoremap <silent> <C-w>l  :<C-u>TmuxNavigateRight<CR>
-nnoremap <silent> <C-w><Leader> :<C-u>TmuxNavigatePrevious<CR>
+if $TMUX !=# '' && !has('gui_running')
+  let g:tmux_navigator_no_mappings = 1
+  nnoremap <silent> <C-w>h  :<C-u>TmuxNavigateLeft<CR>
+  nnoremap <silent> <C-w>j  :<C-u>TmuxNavigateDown<CR>
+  nnoremap <silent> <C-w>k  :<C-u>TmuxNavigateUp<CR>
+  nnoremap <silent> <C-w>l  :<C-u>TmuxNavigateRight<CR>
+  nnoremap <silent> <C-w><Leader> :<C-u>TmuxNavigatePrevious<CR>
+endif
 '''
 
 [[plugins]]
