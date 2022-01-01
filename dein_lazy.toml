@@ -272,9 +272,16 @@ let g:ctrlp_extensions = [
 let g:ctrlp_map = '[ctrlp]p'
 nnoremap [ctrlp] <Nop>
 nmap <C-p>  [ctrlp]
+nnoremap <silent> [ctrlp]p  :<C-u>CtrlP<CR>
+nnoremap <silent> [ctrlp]<C-p>  :<C-u>CtrlP<CR>
 nnoremap <silent> [ctrlp]b  :<C-u>CtrlPBuffer<CR>
+nnoremap <silent> [ctrlp]c  :<C-u>CtrlPChange<CR>
 nnoremap <silent> [ctrlp]k  :<C-u>CtrlPKoTemplate<CR>
+nnoremap <silent> [ctrlp]l  :<C-u>CtrlPLine<CR>
 nnoremap <silent> [ctrlp]m  :<C-u>CtrlPMPlayer<CR>
+nnoremap <silent> [ctrlp]t  :<C-u>CtrlPTag<CR>
+nnoremap <silent> [ctrlp]u  :<C-u>CtrlPUndo<CR>
+nnoremap <silent> [ctrlp]q  :<C-u>CtrlPQuickfix<CR>
 '''
 
 [[plugins]]
