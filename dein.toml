@@ -270,6 +270,14 @@ repo = 'prabirshrestha/async.vim'
 repo = 'mattn/vim-lsp-settings'
 depends = 'vim-lsp'
 hook_add = '''
+let g:lsp_settings_root_markers = [
+      \ 'Assembly-CSharp.csproj',
+      \ '.git',
+      \ '.git/',
+      \ '.svn/',
+      \ '.hg/',
+      \ '.bzr/'
+      \]
 let g:lsp_settings_servers_dir = expand('~/.vim/vim-lsp-settings/servers')
 '''
 
