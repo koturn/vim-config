@@ -333,8 +333,8 @@ endfunction " }}}
 function! vimrc#make_viml_foldings(line1, line2) abort " {{{
   let cursor = getcurpos()
   " {{{ {{{
-  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*\%(endfunction\|endfunctio\|endfuncti\|endfunct\|endfunc\|endfun\|endfu\|endf\)\%([a-z]\)\@!\zs\%(\s*".*}}}\)\@!/ " }}}/ce'
-  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*\%(function\|functio\|functi\|funct\|func\|fun\|fu\)\%([a-z]\)\@!!\?\s\+[a-zA-Z0-9\.:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)*\zs\%(\%(\s\+\%(abort\|dict\|range\)\)*\s*".*{{{\)\@!/ " {{{/ce'
+  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*endf\%[unction]\%([a-z]\)\@!\zs\%(\s*".*}}}\)\@!/ " }}}/ce'
+  execute 'keepjumps keeppatterns' a:line1 ',' a:line2 's/^\s*fu\%[unction]\%([a-z]\)\@!!\?\s\+[a-zA-Z0-9\.:_#{}]\+(.*)\%(\s\+\%(abort\|dict\|range\)\)*\zs\%(\%(\s\+\%(abort\|dict\|range\)\)*\s*".*{{{\)\@!/ " {{{/ce'
   " }}} }}}
   call setpos('.', cursor)
 endfunction " }}}
