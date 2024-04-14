@@ -508,16 +508,17 @@ set matchpairs& matchpairs+=（:）,｛:｝,「:」,『:』
 
 autocmd MyAutoCmd BufNewFile * set ff=unix
 autocmd MyAutoCmd BufWritePre *
-      \   if &ff !=# 'unix' && input(printf('Convert fileformat:%s to unix? [y/N]', &ff)) =~? '^y\%[es]$'
+      \   if !get(b:, 'is_asked_ff_convert', 0) && &ff !=# 'unix' && input(printf('Convert fileformat:%s to unix? [y/N]', &ff)) =~? '^y\%[es]$'
       \ |   setlocal ff=unix
+      \ |   let b:is_asked_ff_convert = 1
       \ | endif
 autocmd MyAutoCmd BufReadPost *
       \   if &modifiable && !search('[^\x00-\x7F]', 'cnw')
-      \ |   setlocal fenc=ascii
+      \ |   setlocal fenc=utf-8
       \ | endif
 autocmd MyAutoCmd BufWritePre *
       \   if &modifiable && &bomb && !search('[^\x00-\x7F]', 'cnw')
-      \ |   setlocal fenc=ascii
+      \ |   setlocal fenc=utf-8
       \ | endif
 function! s:checktime() abort " {{{
   if bufname('%') !~# '^\%(\|[Command Line]\)$' && &filetype !~# '^\%(help\|qf\)$'
