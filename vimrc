@@ -374,7 +374,7 @@ set ignorecase
 set backspace=indent,eol,start
 set wrapscan
 set showmatch
-set wildmenu wildmode=longest:full,full wildoptions=tagfile
+set wildignore+=*.meta
 set wildmenu wildmode=longest:full,full
 if has('patch-8.2.4325')
   set wildoptions=pum
