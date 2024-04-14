@@ -638,6 +638,12 @@ let g:kotemplate#projects = {
 '''
 
 [[plugins]]
+repo = 'koturn/vim-unityguid'
+depends = 'ctrlp.vim'
+on_cmd = ['CtrlPUnityGuid', 'CtrlPUnityGuidFile', 'CtrlPUnityGuidDir'],
+on_func = 'unityguid'
+
+[[plugins]]
 repo = 'koturn/vim-movewin'
 on_cmd = ['MoveWin', 'MoveWinLeft', 'MoveWinDown', 'MoveWinUp', 'MoveWinRight']
 on_map = [['nvoic', '<Plug>(movewin-']]
@@ -873,6 +879,11 @@ on_ft = ['asciidoc', 'markdown', 'textile', 'rst']
 hook_add = '''
 let g:previm_custom_css_path = $DOTVIM . '/previm/custom.css'
 '''
+
+[[plugins]]
+repo = 'koturn/vim-previmglsl'
+depends = 'open-browser.vim'
+on_cmd = ['PrevimGlslOpen', 'PrevimGlslRefresh', 'PrevimGlslWipeCache']
 
 [[plugins]]
 repo = 'rbtnn/puyo.vim'

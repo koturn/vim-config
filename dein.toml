@@ -145,10 +145,24 @@ autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
 '''
 
 [[plugins]]
+repo = 'koturn/asyncomplete-dictionary.vim'
+hook_add = '''
+autocmd User asyncomplete_setup call asyncomplete#register_source(
+      \ asyncomplete#sources#dictionary#get_source_options({
+      \   'name': 'dictionary',
+      \   'allowlist': ['*'],
+      \   'completor': function('asyncomplete#sources#dictionary#completor')
+      \ }))
+'''
+
+[[plugins]]
 repo = 'Shougo/neco-syntax'
 
 [[plugins]]
 repo = 'Shougo/neco-vim'
+
+[[plugins]]
+repo = 'Mizuchi/STL-Syntax'
 
 [[plugins]]
 repo = 'Shougo/neosnippet-snippets'
@@ -287,3 +301,9 @@ let g:lsp_settings_servers_dir = expand('~/.vim/vim-lsp-settings/servers')
 
 [[plugins]]
 repo = 'koturn/vim-shaderlab'
+
+[[plugins]]
+repo = 'tikhomirov/vim-glsl'
+
+[[plugins]]
+repo = 'DingDean/wgsl.vim'
