@@ -444,6 +444,7 @@ function! s:set_term_mintty() abort " {{{
   let &t_SI .= "\e[6 q"
   let &t_EI .= "\e[2 q"
   let &t_te .= "\e[0 q"
+  set ttymouse=sgr
 endfunction " }}}
 
 let s:termemu_dict = {
