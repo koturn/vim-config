@@ -124,6 +124,9 @@ function! hookadd#eskk() abort " {{{
     endif
   endfunction " }}}
   command! -bar UpdateSkkDict call s:update_skk_dict()
+
+  autocmd MyAutoCmd User eskk-enable-pre call asyncomplete#disable_for_buffer()
+  autocmd MyAutoCmd User eskk-disable-pre call asyncomplete#enable_for_buffer()
 endfunction " }}}
 
 
