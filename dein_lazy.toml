@@ -870,6 +870,9 @@ on_ft = 'vimpresen'
 repo = 'previm/previm'
 depends = 'open-browser.vim'
 on_ft = ['asciidoc', 'markdown', 'textile', 'rst']
+hook_add = '''
+let g:previm_custom_css_path = $DOTVIM . '/previm/custom.css'
+'''
 
 [[plugins]]
 repo = 'rbtnn/puyo.vim'
