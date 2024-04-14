@@ -878,6 +878,32 @@ depends = 'open-browser.vim'
 on_ft = ['asciidoc', 'markdown', 'textile', 'rst']
 hook_add = '''
 let g:previm_custom_css_path = $DOTVIM . '/previm/custom.css'
+let g:previm_extra_libraries = [
+      \ {
+      \   'name': 'theme',
+      \   'files': [
+      \     {
+      \       'type': 'js',
+      \       'code': [
+      \         '(function(global) {',
+      \         "  'use strict';",
+      \         '  function applyTheme(themeName) {',
+      \         '    document.documentElement.className = themeName;',
+      \         '  }',
+      \         "  var prefersColorSchemeDark = matchMedia('(prefers-color-scheme: dark)').matches;",
+      \         "  applyTheme(prefersColorSchemeDark ? 'theme-dark' : 'theme-light')",
+      \         '  global.applyLightTheme = function() {',
+      \         "    applyTheme('theme-light')",
+      \         '  };',
+      \         '  global.applyDarkTheme = function() {',
+      \         "    applyTheme('theme-dark')",
+      \         '  };',
+      \         '})(window);'
+      \       ]
+      \     }
+      \   ]
+      \ }
+      \]
 '''
 
 [[plugins]]
