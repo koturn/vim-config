@@ -375,6 +375,12 @@ set backspace=indent,eol,start
 set wrapscan
 set showmatch
 set wildmenu wildmode=longest:full,full wildoptions=tagfile
+set wildmenu wildmode=longest:full,full
+if has('patch-8.2.4325')
+  set wildoptions=pum
+else
+  set wildoptions=tagfile
+endif
 set showcmd
 set cmdheight=2
 set history=200
