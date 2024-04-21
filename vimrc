@@ -58,10 +58,14 @@ if !exists('$MYGVIMRC')
   let $MYGVIMRC = expand('~/.vim/gvimrc')
 endif
 let $DOTVIM = expand('~/.vim')
-if g:at_startup && g:is_windows
-  let &rtp = substitute(&rtp, 'vimfiles', '\.vim', 'g')
-  " let &rtp = substitute(substitute(&rtp, 'vimfiles', '\.vim', 'g'), '\\', '/', 'g')
-  " set rtp^=$DOTVIM,$DOTVIM/after,$VIM/.vim,$VIM/.vim/after
+if g:at_startup
+  if g:is_windows
+    let &rtp = substitute(&rtp, 'vimfiles', '\.vim', 'g')
+    " let &rtp = substitute(substitute(&rtp, 'vimfiles', '\.vim', 'g'), '\\', '/', 'g')
+    " set rtp^=$DOTVIM,$DOTVIM/after,$VIM/.vim,$VIM/.vim/after
+  elseif s:is_nvim
+    set rtp+=~/.vim/
+  endif
 endif
 
 " If $DOTVIM/.private.vim is exists, ignore error.
@@ -263,7 +267,9 @@ set nrformats=alpha,octal,hex
 set scrolloff=5
 if s:is_cui
   set ttyfast
-  set ttyscroll=3
+  if exists('ttyscroll')
+    set ttyscroll=3
+  endif
 endif
 set timeout ttimeout timeoutlen=1000 ttimeoutlen=100
 set autoindent smartindent
