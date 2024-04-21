@@ -1,11 +1,15 @@
-:root, :root.theme-light {
+:root {
+  transition: 0.5s;
+}
+
+:root
+:root.theme-light {
   --color-fg-normal: #333;
   --color-bg-normal: white;
   --color-bg-second: #f8f8f8;
   --color-fg-head: black;
   --color-border-code: #eaeaea;
   --color-blockquote: #777777;
-  --color-blockquote: #e6edf3;
   /* Colors from highlightjs/highlight.js/src/styles/github.css */
   --color-fg-hljs: #24292e;
   --color-bg-hljs: #f8f8f8;
@@ -26,6 +30,7 @@
   --color-fg-hljs-deletion: #b31d28;
   --color-bg-hljs-deletion: #ffeef0;
 }
+
 :root.theme-dark {
   --color-fg-normal: #e6edf3;
   --color-bg-normal: #0d1117;
@@ -62,7 +67,6 @@
   }
 }
 
-
 body {
   line-height: 1.5;
 }
@@ -91,6 +95,7 @@ table {
 ul,
 ol {
   margin: 0;
+  padding-left: 2em;
 }
 
 ul li,
@@ -104,6 +109,15 @@ dl dt {
 
 dl dd {
   margin: 0;
+}
+
+li:has(input[type="checkbox"]) {
+  list-style: none;
+}
+
+li input[type="checkbox"] {
+  margin-left: -1.5em;
+  vertical-align: middle;
 }
 
 pre code.hljs:has(span) {
@@ -134,11 +148,6 @@ pre,
 code {
   border-color: var(--color-border-code);
   background-color: var(--color-bg-second);
-}
-
-a,
-a code {
-  /* color: #4183C4; */
 }
 
 blockquote {
