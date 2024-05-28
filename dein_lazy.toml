@@ -879,6 +879,7 @@ on_ft = ['asciidoc', 'markdown', 'textile', 'rst']
 hook_add = '''
 let g:previm_auto_close = 1
 let g:previm_custom_css_path = $DOTVIM . '/previm/custom.css'
+let g:previm_code_language_show = 1
 let g:previm_extra_libraries = [
       \ {
       \   'name': 'theme',

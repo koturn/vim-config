@@ -2,12 +2,14 @@
   transition: 0.5s;
 }
 
-:root
+:root,
 :root.theme-light {
   --color-fg-normal: #333;
   --color-bg-normal: white;
   --color-bg-second: #f8f8f8;
   --color-fg-head: black;
+  --color-fg-codelang: white;
+  --color-bg-codelang: #5e6060;
   --color-border-code: #eaeaea;
   --color-blockquote: #777777;
   /* Colors from highlightjs/highlight.js/src/styles/github.css */
@@ -36,6 +38,8 @@
   --color-bg-normal: #0d1117;
   --color-bg-second: #161b22;
   --color-fg-head: #e6edf3;
+  --color-fg-codelang: white;
+  --color-bg-codelang: #5e6060;
   --color-border-code: #111111;
   --color-blockquote: #e6edf3;
   /* Colors from highlightjs/highlight.js/src/styles/github-dark.css */
@@ -120,7 +124,7 @@ li input[type="checkbox"] {
   vertical-align: middle;
 }
 
-pre code.hljs:has(span) {
+#preview pre code.hljs {
   padding: 0;
 }
 
@@ -170,6 +174,11 @@ table tr td {
   /* -webkit-box-shadow: 0 5px 15px #000; */
   /* -moz-box-shadow: 0 5px 15px #000; */
   /* box-shadow: 0 5px 15px #000; */
+}
+
+div.code-lang {
+  color: var(--color-fg-codelang);
+  background-color: var(--color-bg-codelang);
 }
 
 /*
