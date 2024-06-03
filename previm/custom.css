@@ -6,10 +6,13 @@
 :root.theme-light {
   --color-fg-normal: #333;
   --color-bg-normal: white;
-  --color-bg-second: #f8f8f8;
+  --color-bg-code: #f8f8f8;
+  --color-bg-table-head: #e0e0e0;
+  --color-bg-table-odd: var(--color-bg-normal);
+  --color-bg-table-even: #f8f8f8;
   --color-fg-head: black;
-  --color-fg-codelang: white;
-  --color-bg-codelang: #5e6060;
+  --color-fg-codelang: #eee;
+  --color-bg-codelang: #777;
   --color-border-code: #eaeaea;
   --color-blockquote: #777777;
   /* Colors from highlightjs/highlight.js/src/styles/github.css */
@@ -36,9 +39,12 @@
 :root.theme-dark {
   --color-fg-normal: #e6edf3;
   --color-bg-normal: #0d1117;
-  --color-bg-second: #161b22;
+  --color-bg-code: #161b22;
+  --color-bg-table-head: #2f2f2f;
+  --color-bg-table-odd: var(--color-bg-normal);
+  --color-bg-table-even: #161b22;
   --color-fg-head: #e6edf3;
-  --color-fg-codelang: white;
+  --color-fg-codelang: #eee;
   --color-bg-codelang: #5e6060;
   --color-border-code: #111111;
   --color-blockquote: #e6edf3;
@@ -148,23 +154,27 @@ h2 {
 
 pre,
 .highlight pre {
-  background-color: var(--color-bg-second);
+  background-color: var(--color-bg-code);
 }
 
 code {
   border-color: var(--color-border-code);
-  background-color: var(--color-bg-second);
+  background-color: var(--color-bg-code);
 }
 
 blockquote {
   color: var(--color-blockquote);
 }
 
+table > thead > tr {
+  background-color: var(--color-bg-table-head);
+}
+
 table tr {
-  background-color: var(--color-bg-normal);
+  background-color: var(--color-bg-table-odd);
 }
 table tr:nth-child(2n) {
-  background-color: var(--color-bg-second);
+  background-color: var(--color-bg-table-even);
 }
 
 table tr th,
