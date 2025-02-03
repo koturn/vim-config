@@ -928,6 +928,9 @@ let g:previm_extra_libraries = [
 repo = 'koturn/vim-previmglsl'
 depends = 'open-browser.vim'
 on_cmd = ['PrevimGlslOpen', 'PrevimGlslRefresh', 'PrevimGlslWipeCache']
+hook_add = '''
+let previmglsl_auto_close = 1
+'''
 
 [[plugins]]
 repo = 'rbtnn/puyo.vim'
