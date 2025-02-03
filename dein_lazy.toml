@@ -1358,6 +1358,8 @@ on_cmd = [
 ]
 on_func = 'lsp'
 hook_add = '''
+let g:lsp_diagnostics_virtual_text_enabled = 0
+let g:lsp_diagnostics_echo_cursor = 1
 autocmd MyAutoCmd User lsp_buffer_enabled call pluginconfig#vim_lsp()
 '''
 
