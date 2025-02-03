@@ -175,6 +175,9 @@ repo = 'brgmnn/vim-opencl'
 
 [[plugins]]
 repo = 'elzr/vim-json'
+hook_add = '''
+let g:vim_json_syntax_conceal = 0
+'''
 
 [[plugins]]
 repo = 'hail2u/vim-css3-syntax'
