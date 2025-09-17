@@ -17,6 +17,9 @@ on_func = 'neovim_rpc'
 
 [[plugins]]
 repo = 'Yggdroot/indentLine'
+hook_add = '''
+let g:indentLine_conceallevel = 0
+'''
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
