@@ -1083,6 +1083,7 @@ let g:loaded_netrw = 1
 let g:loaded_netrwPlugin = 1
 let g:loaded_netrwSettings = 1
 let g:loaded_netrwFileHandlers = 1
+let g:omni_sql_default_compl_type = 'syntax'
 " }}}
 " ------------------------------------------------------------------------------
 " Plugin lists and dein-configuration {{{
