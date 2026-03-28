@@ -224,7 +224,9 @@ if !s:is_nvim
   let g:hl_matchit_speed_level = 1
   let g:hl_matchit_allow_ft_regexp = 'html\|vim\|sh'
 endif
-set pastetoggle=<F10>
+if exists('+pastetoggle')
+  set pastetoggle=<F10>
+endif
 set helplang=ja
 set shortmess& shortmess+=I
 set shellslash
@@ -241,7 +243,9 @@ set synmaxcol=1000
 set textwidth=0
 set colorcolumn=80,100
 set foldmethod=marker
-set browsedir=buffer
+if exists('+browsedir')
+  set browsedir=buffer
+endif
 set showmatch
 set smartcase
 set whichwrap=b,s,h,l,<,>,[,]
@@ -450,7 +454,9 @@ function! s:set_term_mintty() abort " {{{
   let &t_SI .= "\e[6 q"
   let &t_EI .= "\e[2 q"
   let &t_te .= "\e[0 q"
-  set ttymouse=sgr
+  if exists('+ttymouse')
+    set ttymouse=sgr
+  endif
 endfunction " }}}
 
 let s:termemu_dict = {
