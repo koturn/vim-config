@@ -52,16 +52,16 @@ autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
       \ }))
 '''
 
-[[plugins]]
-repo = 'prabirshrestha/asyncomplete-file.vim'
-hook_add = '''
-autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
-      \ asyncomplete#sources#file#get_source_options({
-      \   'name': 'file',
-      \   'allowlist': ['*'],
-      \   'completor': function('asyncomplete#sources#file#completor')
-      \ }))
-'''
+# [[plugins]]
+# repo = 'prabirshrestha/asyncomplete-file.vim'
+# hook_add = '''
+# autocmd MyAutoCmd User asyncomplete_setup call asyncomplete#register_source(
+#       \ asyncomplete#sources#file#get_source_options({
+#       \   'name': 'file',
+#       \   'allowlist': ['*'],
+#       \   'completor': function('asyncomplete#sources#file#completor')
+#       \ }))
+# '''
 
 [[plugins]]
 repo = 'yami-beta/asyncomplete-omni.vim'
